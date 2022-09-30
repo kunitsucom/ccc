@@ -1,0 +1,49 @@
+# https://golangci-lint.run/usage/linters/
+linters:
+  enable-all: true
+  disable:
+    - exhaustruct # https://github.com/GaijinEntertainment/go-exhaustruct
+    - exhaustivestruct # https://github.com/mbilski/exhaustivestruct
+    - golint # deprecated https://github.com/golang/lint
+    - gomnd # https://github.com/tommy-muehle/go-mnd
+    - ifshort # for readability
+    - interfacer # deprecated https://github.com/mvdan/interfacer
+    - ireturn # Too many false negatives.
+    - lll # unnecessary
+    - maligned # deprecated https://github.com/mdempsky/maligned
+    - nlreturn # ignore "return with no blank line before"
+    - nolintlint # unnecessary
+    - nonamedreturns # unnecessary
+    - nosnakecase # for environment variable key
+    - varnamelen # unnecessary
+    - wsl # ignore "declarations should never be cuddled"
+
+linters-settings:
+  # varnamelen:
+  #   ignore-decls:
+  #     - l *Logger
+  #     - l *rec.Logger
+  #     - rw http.ResponseWriter
+  #     - w http.ResponseWriter
+  #     - r *http.Request
+  wrapcheck:
+    ignoreSigs:
+      - func errors.New(text string) error
+      - func fmt.Errorf(format string, a ...any) error
+      - func github.com/kunitsuinc/ccc/pkg/errorz.Errorf(format string, a ...interface{}) error
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - containedctx
+        - cyclop
+        - dupl
+        - funlen
+        - gochecknoglobals
+        - gocognit
+        - goconst
+        - goerr113
+        - maintidx
+        - noctx
+        - varnamelen
