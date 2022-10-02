@@ -28,4 +28,9 @@ test: githooks ## go test を実行し coverage を出力します。
 	go tool cover -func=./coverage.txt
 
 .PHONY: ci
-ci: lint test ## CI 上で実行する lint や test のコマンドセット
+ci: lint test ## CI 上で実行する lint や test のコマンドセットです。
+
+.PHONY: credits
+credits:  ## CREDITS ファイルを生成します。
+	command -v gocredits || go install github.com/Songmu/gocredits/cmd/gocredits@latest
+	gocredits . > CREDITS
