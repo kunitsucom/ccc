@@ -1,6 +1,11 @@
-SHELL    := /usr/bin/env bash -Eeu -o pipefail
-GITROOT  := $(shell git rev-parse --show-toplevel || pwd || echo '.')
-PRE_PUSH := ${GITROOT}/.git/hooks/pre-push
+SHELL     := /usr/bin/env bash -Eeu -o pipefail
+GITROOT   := $(shell git rev-parse --show-toplevel || pwd || echo '.')
+PRE_PUSH  := ${GITROOT}/.git/hooks/pre-push
+GOMODULE  := github.com/kunitsuinc/ccc
+VERSION   := $(shell git describe --tags --abbrev=0 --always)
+REVISION  := $(shell git log -1 --format='%H')
+BRANCH    := $(shell git rev-parse --abbrev-ref HEAD)
+TIMESTAMP := $(shell git log -1 --format='%cI')
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -34,3 +39,8 @@ ci: lint test ## CI 上で実行する lint や test のコマンドセットで
 credits:  ## CREDITS ファイルを生成します。
 	command -v gocredits || go install github.com/Songmu/gocredits/cmd/gocredits@latest
 	gocredits . > CREDITS
+
+.PHONY: goxz
+goxz: ci ## goxz を用いて release 用ファイルを生成します。
+	command -v goxz || go install github.com/Songmu/goxz/cmd/goxz@latest
+	goxz -d ./.tmp -os=linux,darwin -arch=amd64,arm64 -pv ${VERSION} -build-ldflags "-X ${GOMODULE}/pkg/config.version=${VERSION} -X ${GOMODULE}/pkg/config.revision=${REVISION} -X ${GOMODULE}/pkg/config.branch=${BRANCH} -X ${GOMODULE}/pkg/config.timestamp=${TIMESTAMP}" ./cmd/ccc

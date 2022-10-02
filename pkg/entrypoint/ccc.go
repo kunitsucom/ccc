@@ -16,8 +16,6 @@ import (
 )
 
 func CCC(ctx context.Context) error {
-	config.Load()
-
 	var (
 		tz           = config.TimeZone()
 		days         = config.Days()

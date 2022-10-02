@@ -26,6 +26,7 @@ const (
 )
 
 type config struct {
+	SubcommandVersion  bool
 	Debug              bool
 	TimeZone           *time.Location
 	Days               int
@@ -51,6 +52,7 @@ func Load() {
 
 	var tz string
 
+	flag.BoolVar(&cfg.SubcommandVersion, "version", false, "Display version info")
 	flag.BoolVar(&cfg.Debug, "debug", env.BoolOrDefault(DEBUG, false), "Debug")
 	flag.StringVar(&tz, "tz", env.StringOrDefault(TZ, time.UTC.String()), "Time Zone for BigQuery")
 	flag.IntVar(&cfg.Days, "days", env.IntOrDefault(DAYS, 30), "Days for BigQuery")
@@ -63,7 +65,9 @@ func Load() {
 	flag.Parse()
 
 	cfg.TimeZone = constz.TimeZone(tz)
+}
 
+func MustCheck() {
 	if cfg.GoogleCloudProject == "" {
 		cfg.GoogleCloudProject = env.MustString(GOOGLE_CLOUD_PROJECT)
 	}
@@ -85,6 +89,7 @@ func Load() {
 	}
 }
 
+func SubcommandVersion() bool    { return cfg.SubcommandVersion }
 func Debug() bool                { return cfg.Debug }
 func TimeZone() *time.Location   { return cfg.TimeZone }
 func Days() int                  { return cfg.Days }
