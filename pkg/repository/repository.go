@@ -33,19 +33,19 @@ func WithBigQuery(bigquery *bigquery.BigQuery) Option {
 	}
 }
 
-func (r *Repository) SUMServiceCostGCP(ctx context.Context, projectID, datasetName, tableName string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
-	serviceCost, err := r.bigquery.SUMServiceCostGCP(ctx, projectID, datasetName, tableName, from, to, tz, costThreshold)
+func (r *Repository) SUMServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+	serviceCost, err := r.bigquery.SUMServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.BigQuery).ServiceMonthly: %w", err)
+		return nil, errorz.Errorf("(*bigquery.BigQuery).SUMServiceCostGCP: %w", err)
 	}
 
 	return serviceCost, nil
 }
 
-func (r *Repository) DailyServiceCostGCP(ctx context.Context, projectID, datasetName, tableName string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
-	serviceCost, err := r.bigquery.DailyServiceCostGCP(ctx, projectID, datasetName, tableName, from, to, tz, costThreshold)
+func (r *Repository) DailyServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+	serviceCost, err := r.bigquery.DailyServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.BigQuery).ServiceDaily: %w", err)
+		return nil, errorz.Errorf("(*bigquery.BigQuery).DailyServiceCostGCP: %w", err)
 	}
 
 	return serviceCost, nil

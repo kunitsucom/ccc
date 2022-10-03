@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -29,6 +31,8 @@ func printf(prefix, format string, v ...any) {
 	loggerBufferMu.Lock()
 	defer loggerBufferMu.Unlock()
 
+	prefix += caller(4) + " "
+
 	for _, s := range strings.Split(fmt.Sprintf(format, v...), "\n") {
 		DefaultLogger.Printf("%s%s", prefix, s)
 	}
@@ -38,6 +42,48 @@ func printf(prefix, format string, v ...any) {
 		log.Printf("[ERROR] %v", err)
 		return
 	}
+}
+
+type programcounter struct {
+	PC []uintptr
+}
+
+var pcPool = &sync.Pool{ // nolint: gochecknoglobals
+	New: func() interface{} {
+		return &programcounter{make([]uintptr, 64)}
+	},
+}
+
+func caller(callerSkip int) string {
+	pc := pcPool.Get().(*programcounter) // nolint: forcetypeassert
+	defer pcPool.Put(pc)
+
+	var frame runtime.Frame
+	if runtime.Callers(callerSkip, pc.PC) > 0 {
+		frame, _ = runtime.CallersFrames(pc.PC).Next()
+	}
+
+	return extractShortPath(frame.File) + ":" + strconv.Itoa(frame.Line)
+}
+
+func extractShortPath(path string) string {
+	// path == /path/to/directory/file
+	//                           ~ <- idx
+	idx := strings.LastIndexByte(path, '/')
+	if idx == -1 {
+		return path
+	}
+
+	// path[:idx] == /path/to/directory
+	//                       ~ <- idx
+	idx = strings.LastIndexByte(path[:idx], '/')
+	if idx == -1 {
+		return path
+	}
+
+	// path == /path/to/directory/file
+	//                  ~~~~~~~~~~~~~~ <- filepath[idx+1:]
+	return path[idx+1:]
 }
 
 func Debugf(format string, v ...any) {

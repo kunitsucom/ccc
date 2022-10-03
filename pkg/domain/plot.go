@@ -3,11 +3,13 @@ package domain
 import (
 	"image/color"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/constz"
 	"github.com/kunitsuinc/ccc/pkg/errorz"
 	"github.com/kunitsuinc/ccc/pkg/log"
+	"github.com/kunitsuinc/util.go/mathz"
 	"github.com/kunitsuinc/util.go/slice"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/font"
@@ -15,7 +17,7 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-// nolint: funlen
+// nolint: cyclop,funlen
 func Plot1280x720(
 	target io.Writer,
 	graphTitle string,
@@ -40,7 +42,7 @@ func Plot1280x720(
 
 	const graphWidth = (1280 / 4) * 3 // NOTE: 1280 pixel / 4 * 3 = 960
 	const graphHight = (graphWidth / 16) * 9
-	barChartWidth := vg.Points((graphWidth - 95) / float64(xAxisPointsCount)) // NOTE: グラフの幅から固定長(95)を引いて X 軸の値数で割る
+	barChartWidth := vg.Points((graphWidth - 100) / float64(xAxisPointsCount)) // NOTE: グラフの幅から固定長(95)を引いて X 軸の値数で割る
 
 	previousBarChart := (*plotter.BarChart)(nil)
 	for i, legend := range legends {
@@ -86,7 +88,35 @@ func Plot1280x720(
 	legendHight := float64(p.Legend.TextStyle.Height("C")) * 8
 	legendsHight := legendHight * float64(len(legends))
 	log.Debugf("legendHight=%f, legendsHight=%f", legendHight, legendsHight)
+	p.Y.Min = 0
 	p.Y.Max += legendsHight // NOTE: グラフと Legend が被らないように、 Legend の高さ (文字 C の高さで計算) * Legend 数を足して、 Y 軸の高さを確保している
+	p.Y.Tick.Marker = plot.ConstantTicks(func() []plot.Tick {
+		var ticks []plot.Tick
+		unit := func() int { // NOTE: どの単位で Y 軸グリッドを入れるか。 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, ... のどれかが入る
+			unit := 1
+			for i := p.Y.Max; i > 10; i = p.Y.Max / float64(unit) {
+				if mathz.IsPow10(float64(unit)) {
+					unit *= 5
+					continue
+				}
+				unit *= 2
+			}
+			return unit
+		}()
+		numOfYGrid := int(p.Y.Max / float64(unit)) // NOTE: グラフ内に何本 Y 軸 grid を入れるか
+		for i := 0; i <= numOfYGrid; i++ {
+			value := unit * i
+			ticks = append(
+				ticks,
+				plot.Tick{
+					// NOTE: unit==500 の場合は 500, 1000, 1500, 2000, ... に Y 軸グリッドを書き込む
+					Label: strconv.Itoa(value),
+					Value: float64(value),
+				},
+			)
+		}
+		return ticks
+	}())
 
 	wt, err := p.WriterTo(graphWidth, graphHight, imageFormat)
 	if err != nil {

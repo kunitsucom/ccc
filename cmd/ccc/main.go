@@ -8,6 +8,7 @@ import (
 	"github.com/kunitsuinc/ccc/pkg/config"
 	"github.com/kunitsuinc/ccc/pkg/entrypoint"
 	"github.com/kunitsuinc/ccc/pkg/log"
+	"github.com/kunitsuinc/util.go/must"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 		return
 	}
 
-	config.MustCheck()
+	must.Must(config.Check())
 
 	if err := entrypoint.CCC(ctx); err != nil {
 		log.Errorf("entrypoint.CCC: %v", err)

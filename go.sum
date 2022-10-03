@@ -225,8 +225,8 @@ github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+o
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/kunitsuinc/util.go v0.0.2 h1:Q29tcFQiLEHIXDzgZccT4SOMNHxhndJpaQcKw7iiLHM=
-github.com/kunitsuinc/util.go v0.0.2/go.mod h1:R5WwGRMv8IrMqLqSwgjR0Qnjba7pzt3LwWHkBcNeyNc=
+github.com/kunitsuinc/util.go v0.0.5 h1:VoQlWG+4fQQJdxIWwqv+F2DwHzpjPd+eFbvi87TEyl4=
+github.com/kunitsuinc/util.go v0.0.5/go.mod h1:R5WwGRMv8IrMqLqSwgjR0Qnjba7pzt3LwWHkBcNeyNc=
 github.com/phpdave11/gofpdf v1.4.2/go.mod h1:zpO6xFn9yxo3YLyMvW8HcKWVdbNqgIfOOp2dXMnm1mY=
 github.com/phpdave11/gofpdi v1.0.12/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=
 github.com/phpdave11/gofpdi v1.0.13/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=

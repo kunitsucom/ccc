@@ -13,52 +13,51 @@ import (
 )
 
 type dailyProjectCostGCPParameter struct {
-	TimeZone      *time.Location
-	ProjectID     string
-	DatasetName   string
-	TableName     string
-	From          string
-	To            string
-	CostThreshold float64
+	TimeZone          *time.Location
+	GCPBillingTable   string
+	GCPBillingProject string
+	From              string
+	To                string
+	CostThreshold     float64
 }
 
 // nolint: gochecknoglobals
 var dailyProjectCostGCPTemplate = template.Must(template.New("DailyProjectCostGCP").Parse(`-- DailyProjectCostGCP
 SELECT
     FORMAT_DATE('%F', usage_start_time, '{{ .TimeZone }}') AS day,
-    IFNULL(project.name, '{{ .ProjectID }}') AS project,
     ROUND(SUM(cost * 100)) / 100 AS cost,
     currency
 FROM
-    ` + "`{{ .ProjectID }}.{{ .DatasetName }}.{{ .TableName }}`" + `
+    ` + "`{{ .GCPBillingTable }}`" + `
 WHERE
+    project.id = '{{ .GCPBillingProject }}'
+AND
     DATE(usage_start_time, '{{ .TimeZone }}') >= DATE("{{ .From }}", '{{ .TimeZone }}')
 AND
     DATE(usage_start_time, '{{ .TimeZone }}') <= DATE("{{ .To }}", '{{ .TimeZone }}')
 AND
     cost >= {{ .CostThreshold }}
 GROUP BY
-    day, project, currency
+    day, currency
 ORDER BY
     cost
 DESC
 ;`))
 
-func (c *BigQuery) DailyProjectCostGCP(ctx context.Context, projectID, datasetName, tableName string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPCost, error) {
+func (c *BigQuery) DailyProjectCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPCost, error) {
 	q, err := buildQuery(dailyProjectCostGCPTemplate, dailyProjectCostGCPParameter{
-		TimeZone:      tz,
-		ProjectID:     projectID,
-		DatasetName:   datasetName,
-		TableName:     tableName,
-		From:          from.Format(constz.DateOnly),
-		To:            to.Format(constz.DateOnly),
-		CostThreshold: costThreshold,
+		TimeZone:          tz,
+		GCPBillingTable:   billingTable,
+		GCPBillingProject: billingProject,
+		From:              from.Format(constz.DateOnly),
+		To:                to.Format(constz.DateOnly),
+		CostThreshold:     costThreshold,
 	})
 	if err != nil {
 		return nil, errorz.Errorf("buildQuery: %w", err)
 	}
 
-	log.Debugf(q)
+	log.Debugf("%s", q)
 
 	results, err := query[domain.GCPCost](ctx, c.client, q)
 	if err != nil {

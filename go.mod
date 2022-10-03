@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/kunitsuinc/util.go v0.0.2
+	github.com/kunitsuinc/util.go v0.0.5
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gonum.org/v1/plot v0.12.0
 )

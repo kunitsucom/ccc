@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/constz"
+	"github.com/kunitsuinc/ccc/pkg/errorz"
 	"github.com/kunitsuinc/util.go/env"
 )
 
@@ -18,24 +19,25 @@ const (
 	TZ                   = "TZ"
 	DAYS                 = "DAYS"
 	GOOGLE_CLOUD_PROJECT = "GOOGLE_CLOUD_PROJECT"
-	BIGQUERY_DATASET     = "BIGQUERY_DATASET"
-	BIGQUERY_TABLE       = "BIGQUERY_TABLE"
+	GCP_BILLING_PROJECT  = "GCP_BILLING_PROJECT"
+	GCP_BILLING_TABLE    = "GCP_BILLING_TABLE"
 	IMAGE_FORMAT         = "IMAGE_FORMAT"
 	SLACK_TOKEN          = "SLACK_TOKEN"
 	SLACK_CHANNEL        = "SLACK_CHANNEL"
+	SLACK_COMMENT        = "SLACK_COMMENT"
 )
 
 type config struct {
-	SubcommandVersion  bool
 	Debug              bool
 	TimeZone           *time.Location
 	Days               int
 	GoogleCloudProject string
-	BigQueryDataset    string
-	BigQueryTable      string
+	GCPBillingProject  string
+	GCPBillingTable    string
 	ImageFormat        string
 	SlackToken         string
 	SlackChannel       string
+	SlackComment       string
 }
 
 // nolint: gochecknoglobals
@@ -48,54 +50,76 @@ func Load() {
 	cfgMu.Lock()
 	defer cfgMu.Unlock()
 
-	const empty = ""
-
 	var tz string
 
-	flag.BoolVar(&cfg.SubcommandVersion, "version", false, "Display version info")
+	flag.BoolVar(&subcommandVersion, "version", false, "Display version info")
 	flag.BoolVar(&cfg.Debug, "debug", env.BoolOrDefault(DEBUG, false), "Debug")
 	flag.StringVar(&tz, "tz", env.StringOrDefault(TZ, time.UTC.String()), "Time Zone for BigQuery")
 	flag.IntVar(&cfg.Days, "days", env.IntOrDefault(DAYS, 30), "Days for BigQuery")
 	flag.StringVar(&cfg.ImageFormat, "imgfmt", env.StringOrDefault(IMAGE_FORMAT, "png"), "Image Format")
-	flag.StringVar(&cfg.GoogleCloudProject, "project", empty, "Google Cloud Project ID")
-	flag.StringVar(&cfg.BigQueryDataset, "dataset", empty, "BigQuery Dataset")
-	flag.StringVar(&cfg.BigQueryTable, "table", empty, "BigQuery Table name like: gcp_billing_export_v1_FFFFFF_FFFFFF_FFFFFF")
-	flag.StringVar(&cfg.SlackToken, "slack-token", empty, "Slack OAuth Token like: xoxb-999999999999-9999999999999-ZZZZZZZZZZZZZZZZZZZZZZZZ")
-	flag.StringVar(&cfg.SlackChannel, "slack-channel", empty, "Slack Channel name")
+	flag.StringVar(&cfg.GoogleCloudProject, "project", "", "Google Cloud Project ID")
+	flag.StringVar(&cfg.GCPBillingTable, "billing-table", "", "GCP Billing export BigQuery Table name like: project-id.dataset_id.gcp_billing_export_v1_FFFFFF_FFFFFF_FFFFFF")
+	flag.StringVar(&cfg.GCPBillingProject, "billing-project", "", "Project ID in GCP Billing export BigQuery Table")
+	flag.StringVar(&cfg.SlackToken, "slack-token", "", "Slack OAuth Token like: xoxb-999999999999-9999999999999-ZZZZZZZZZZZZZZZZZZZZZZZZ")
+	flag.StringVar(&cfg.SlackChannel, "slack-channel", "", "Slack Channel name")
+	flag.StringVar(&cfg.SlackComment, "slack-comment", env.StringOrDefault(SLACK_COMMENT, ""), "Slack Comment")
 	flag.Parse()
 
 	cfg.TimeZone = constz.TimeZone(tz)
 }
 
-func MustCheck() {
+// nolint: cyclop
+func Check() error {
 	if cfg.GoogleCloudProject == "" {
-		cfg.GoogleCloudProject = env.MustString(GOOGLE_CLOUD_PROJECT)
+		v, err := env.String(GOOGLE_CLOUD_PROJECT)
+		if err != nil {
+			return errorz.Errorf("env.String: %w", err)
+		}
+		cfg.GoogleCloudProject = v
 	}
 
-	if cfg.BigQueryDataset == "" {
-		cfg.BigQueryDataset = env.MustString(BIGQUERY_DATASET)
+	if cfg.GCPBillingTable == "" {
+		v, err := env.String(GCP_BILLING_TABLE)
+		if err != nil {
+			return errorz.Errorf("env.String: %w", err)
+		}
+		cfg.GCPBillingTable = v
 	}
 
-	if cfg.BigQueryTable == "" {
-		cfg.BigQueryTable = env.MustString(BIGQUERY_TABLE)
+	if cfg.GCPBillingProject == "" {
+		v, err := env.String(GCP_BILLING_PROJECT)
+		if err != nil {
+			return errorz.Errorf("env.String: %w", err)
+		}
+		cfg.GCPBillingProject = v
 	}
 
 	if cfg.SlackToken == "" {
-		cfg.SlackToken = env.MustString(SLACK_TOKEN)
+		v, err := env.String(SLACK_TOKEN)
+		if err != nil {
+			return errorz.Errorf("env.String: %w", err)
+		}
+		cfg.SlackToken = v
 	}
 
 	if cfg.SlackChannel == "" {
-		cfg.SlackChannel = env.MustString(SLACK_CHANNEL)
+		v, err := env.String(SLACK_CHANNEL)
+		if err != nil {
+			return errorz.Errorf("env.String: %w", err)
+		}
+		cfg.SlackChannel = v
 	}
+
+	return nil
 }
 
-func SubcommandVersion() bool    { return cfg.SubcommandVersion }
 func Debug() bool                { return cfg.Debug }
 func TimeZone() *time.Location   { return cfg.TimeZone }
 func Days() int                  { return cfg.Days }
 func ImageFormat() string        { return cfg.ImageFormat }
 func GoogleCloudProject() string { return cfg.GoogleCloudProject }
-func BigQueryDataset() string    { return cfg.BigQueryDataset }
-func BigQueryTable() string      { return cfg.BigQueryTable }
+func GCPBillingProject() string  { return cfg.GCPBillingProject }
+func GCPBillingTable() string    { return cfg.GCPBillingTable }
 func SlackToken() string         { return cfg.SlackToken }
 func SlackChannel() string       { return cfg.SlackChannel }
+func SlackComment() string       { return cfg.SlackComment }

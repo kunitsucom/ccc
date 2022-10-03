@@ -2,13 +2,15 @@ package config
 
 // nolint: deadcode,gochecknoglobals,unused,varcheck
 var (
-	version   string
-	revision  string
-	branch    string
-	timestamp string
+	subcommandVersion bool
+	version           string
+	revision          string
+	branch            string
+	timestamp         string
 )
 
-func Version() string   { return version }
-func Revision() string  { return revision }
-func Branch() string    { return branch }
-func Timestamp() string { return timestamp }
+func SubcommandVersion() bool { return subcommandVersion }
+func Version() string         { return version }
+func Revision() string        { return revision }
+func Branch() string          { return branch }
+func Timestamp() string       { return timestamp }

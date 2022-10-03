@@ -41,21 +41,21 @@ func WithRepository(r *repository.Repository) Option {
 	}
 }
 
-func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.Writer, projectID, datasetName, tableName string, from, to time.Time, tz *time.Location, imageFormat string) error {
-	sumServiceCostGCP, err := u.r.SUMServiceCostGCP(ctx, projectID, datasetName, tableName, from, to, tz, 0.01)
+func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.Writer, billingTable, billingProject string, from, to time.Time, tz *time.Location, imageFormat string) error {
+	sumServiceCostGCP, err := u.r.SUMServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, 0.01)
 	if err != nil {
-		return errorz.Errorf("(*bigquery.BigQuery).ServiceMonthly: %w", err)
+		return errorz.Errorf("(*repository.Repository).SUMServiceCostGCP: %w", err)
 	}
 	servicesOrderBySUMServiceCost := u.r.ServicesOrderBySUMServiceCostGCP(sumServiceCostGCP)
 
-	dailyServiceCostGCP, err := u.r.DailyServiceCostGCP(ctx, projectID, datasetName, tableName, from, to, tz, 0.01)
+	dailyServiceCostGCP, err := u.r.DailyServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, 0.01)
 	log.Debugf("%v", dailyServiceCostGCP)
 	if err != nil {
-		return errorz.Errorf("(*bigquery.BigQuery).ServiceDaily: %w", err)
+		return errorz.Errorf("(*repository.Repository).DailyServiceCostGCP: %w", err)
 	}
 	currencies := slice.Uniq(slice.Select(dailyServiceCostGCP, func(_ int, s domain.GCPServiceCost) (selected string) { return s.Currency }))
 	if len(currencies) != 1 {
-		return errorz.Errorf("%s.%s.%s: %v: %w", projectID, datasetName, tableName, currencies, ErrMixedCurrenciesDataSourceIsNotSupported)
+		return errorz.Errorf("%s: %s: %v: %w", billingTable, billingProject, currencies, ErrMixedCurrenciesDataSourceIsNotSupported)
 	}
 	currency := currencies[0]
 	dailyServiceCostGCPMapByService := u.r.DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCost, dailyServiceCostGCP)
@@ -71,9 +71,9 @@ func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.Writer,
 
 	if err := domain.Plot1280x720(
 		target,
-		fmt.Sprintf("Google Cloud Platform Cost (from %s to %s)", from.Format(constz.DateOnly), to.Format(constz.DateOnly)),
-		fmt.Sprintf("Date (%s)", tz.String()),
-		currency,
+		"\n"+fmt.Sprintf("Google Cloud Platform `%s` Cost (from %s to %s)", billingProject, from.Format(constz.DateOnly), to.Format(constz.DateOnly)),
+		"\n"+fmt.Sprintf("Date (%s)", tz.String()),
+		"\n"+currency,
 		xAxisPointsCount,
 		from,
 		to,

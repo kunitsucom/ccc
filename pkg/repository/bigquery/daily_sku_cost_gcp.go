@@ -14,54 +14,53 @@ import (
 
 // nolint: deadcode,unused
 type dailySKUCostGCPParameter struct {
-	TimeZone      *time.Location
-	ProjectID     string
-	DatasetName   string
-	TableName     string
-	From          string
-	To            string
-	CostThreshold float64
+	TimeZone          *time.Location
+	GCPBillingTable   string
+	GCPBillingProject string
+	From              string
+	To                string
+	CostThreshold     float64
 }
 
 // nolint: deadcode,unused,varcheck,gochecknoglobals
 var dailySKUCostGCPTemplate = template.Must(template.New("DailySKUCostGCP").Parse(`-- DailySKUCostGCP
 SELECT
     FORMAT_DATE('%F', usage_start_time, '{{ .TimeZone }}') AS day,
-    IFNULL(project.name, '{{ .ProjectID }}') AS project,
     service.description AS service,
     CONCAT(service.description, ' ', sku.description) AS sku,
     ROUND(SUM(cost * 100)) / 100 AS cost,
     currency
 FROM
-    ` + "`{{ .ProjectID }}.{{ .DatasetName }}.{{ .TableName }}`" + `
+    ` + "`{{ .GCPBillingTable }}`" + `
 WHERE
+    project.id = '{{ .GCPBillingProject }}'
+AND
     DATE(usage_start_time, '{{ .TimeZone }}') >= DATE("{{ .From }}", '{{ .TimeZone }}')
 AND
     DATE(usage_start_time, '{{ .TimeZone }}') <= DATE("{{ .To }}", '{{ .TimeZone }}')
 AND
     cost >= {{ .CostThreshold }}
 GROUP BY
-    day, project, service, sku, currency
+    day, service, sku, currency
 ORDER BY
     cost
 DESC
 ;`))
 
-func (c *BigQuery) DailySKUCostGCP(ctx context.Context, projectID, datasetName, tableName string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPSKUCost, error) {
+func (c *BigQuery) DailySKUCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPSKUCost, error) {
 	q, err := buildQuery(dailyServiceCostGCPTemplate, dailySKUCostGCPParameter{
-		TimeZone:      tz,
-		ProjectID:     projectID,
-		DatasetName:   datasetName,
-		TableName:     tableName,
-		From:          from.Format(constz.DateOnly),
-		To:            to.Format(constz.DateOnly),
-		CostThreshold: costThreshold,
+		TimeZone:          tz,
+		GCPBillingTable:   billingTable,
+		GCPBillingProject: billingProject,
+		From:              from.Format(constz.DateOnly),
+		To:                to.Format(constz.DateOnly),
+		CostThreshold:     costThreshold,
 	})
 	if err != nil {
 		return nil, errorz.Errorf("buildQuery: %w", err)
 	}
 
-	log.Debugf(q)
+	log.Debugf("%s", q)
 
 	results, err := query[domain.GCPSKUCost](ctx, c.client, q)
 	if err != nil {
