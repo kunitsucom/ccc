@@ -26,6 +26,12 @@ lint:  ## go mod tidy の後に golangci-lint を実行します。
 	./.bin/golangci-lint run --fix --sort-results
 	git diff --exit-code
 
+.PHONY: credits
+credits:  ## CREDITS ファイルを生成します。
+	command -v gocredits || go install github.com/Songmu/gocredits/cmd/gocredits@latest
+	gocredits . > CREDITS
+	git diff --exit-code
+
 .PHONY: test
 test: githooks ## go test を実行し coverage を出力します。
 	# test
@@ -33,14 +39,9 @@ test: githooks ## go test を実行し coverage を出力します。
 	go tool cover -func=./coverage.txt
 
 .PHONY: ci
-ci: lint test ## CI 上で実行する lint や test のコマンドセットです。
-
-.PHONY: credits
-credits:  ## CREDITS ファイルを生成します。
-	command -v gocredits || go install github.com/Songmu/gocredits/cmd/gocredits@latest
-	gocredits . > CREDITS
+ci: lint credits test ## CI 上で実行する lint や test のコマンドセットです。
 
 .PHONY: goxz
 goxz: ci ## goxz を用いて release 用ファイルを生成します。
 	command -v goxz || go install github.com/Songmu/goxz/cmd/goxz@latest
-	goxz -d ./.tmp -os=linux,darwin -arch=amd64,arm64 -pv ${VERSION} -build-ldflags "-X ${GOMODULE}/pkg/config.version=${VERSION} -X ${GOMODULE}/pkg/config.revision=${REVISION} -X ${GOMODULE}/pkg/config.branch=${BRANCH} -X ${GOMODULE}/pkg/config.timestamp=${TIMESTAMP}" ./cmd/ccc
+	goxz -d ./.tmp -os=linux,darwin,windows -arch=amd64,arm64 -pv ${VERSION} -build-ldflags "-X ${GOMODULE}/pkg/config.version=${VERSION} -X ${GOMODULE}/pkg/config.revision=${REVISION} -X ${GOMODULE}/pkg/config.branch=${BRANCH} -X ${GOMODULE}/pkg/config.timestamp=${TIMESTAMP}" ./cmd/ccc
