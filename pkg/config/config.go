@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"flag"
+	"log"
 	"sync"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/kunitsuinc/util.go/env"
 )
 
-var ErrFlagOrEnvIsNotSet = errors.New("flag or environment variable is not set")
+var ErrFlagOrEnvIsNotEnough = errors.New("flag or environment variable is not enough")
 
 // nolint: revive,stylecheck
 const (
@@ -22,9 +23,10 @@ const (
 	GCP_BILLING_PROJECT  = "GCP_BILLING_PROJECT"
 	GCP_BILLING_TABLE    = "GCP_BILLING_TABLE"
 	IMAGE_FORMAT         = "IMAGE_FORMAT"
+	MESSAGE              = "MESSAGE"
 	SLACK_TOKEN          = "SLACK_TOKEN"
 	SLACK_CHANNEL        = "SLACK_CHANNEL"
-	SLACK_COMMENT        = "SLACK_COMMENT"
+	IMAGE_DIR            = "IMAGE_DIR"
 )
 
 type config struct {
@@ -35,9 +37,10 @@ type config struct {
 	GCPBillingProject  string
 	GCPBillingTable    string
 	ImageFormat        string
+	Message            string
 	SlackToken         string
 	SlackChannel       string
-	SlackComment       string
+	ImageDir           string
 }
 
 // nolint: gochecknoglobals
@@ -56,13 +59,14 @@ func Load() {
 	flag.BoolVar(&cfg.Debug, "debug", env.BoolOrDefault(DEBUG, false), "Debug")
 	flag.StringVar(&tz, "tz", env.StringOrDefault(TZ, time.UTC.String()), "Time Zone for BigQuery")
 	flag.IntVar(&cfg.Days, "days", env.IntOrDefault(DAYS, 30), "Days for BigQuery")
-	flag.StringVar(&cfg.ImageFormat, "imgfmt", env.StringOrDefault(IMAGE_FORMAT, "png"), "Image Format")
+	flag.StringVar(&cfg.ImageFormat, "image-format", env.StringOrDefault(IMAGE_FORMAT, "png"), "Image Format")
 	flag.StringVar(&cfg.GoogleCloudProject, "project", "", "Google Cloud Project ID")
 	flag.StringVar(&cfg.GCPBillingTable, "billing-table", "", "GCP Billing export BigQuery Table name like: project-id.dataset_id.gcp_billing_export_v1_FFFFFF_FFFFFF_FFFFFF")
 	flag.StringVar(&cfg.GCPBillingProject, "billing-project", "", "Project ID in GCP Billing export BigQuery Table")
-	flag.StringVar(&cfg.SlackToken, "slack-token", "", "Slack OAuth Token like: xoxb-999999999999-9999999999999-ZZZZZZZZZZZZZZZZZZZZZZZZ")
-	flag.StringVar(&cfg.SlackChannel, "slack-channel", "", "Slack Channel name")
-	flag.StringVar(&cfg.SlackComment, "slack-comment", env.StringOrDefault(SLACK_COMMENT, ""), "Slack Comment")
+	flag.StringVar(&cfg.Message, "message", env.StringOrDefault(MESSAGE, ""), "Slack Message or Log Message")
+	flag.StringVar(&cfg.SlackToken, "slack-token", env.StringOrDefault(SLACK_TOKEN, ""), "Slack OAuth Token like: xoxb-999999999999-9999999999999-ZZZZZZZZZZZZZZZZZZZZZZZZ")
+	flag.StringVar(&cfg.SlackChannel, "slack-channel", env.StringOrDefault(SLACK_CHANNEL, ""), "Slack Channel name")
+	flag.StringVar(&cfg.ImageDir, "image-dir", env.StringOrDefault(IMAGE_DIR, ""), "Directory to save image file")
 	flag.Parse()
 
 	cfg.TimeZone = constz.TimeZone(tz)
@@ -94,22 +98,18 @@ func Check() error {
 		cfg.GCPBillingProject = v
 	}
 
-	if cfg.SlackToken == "" {
-		v, err := env.String(SLACK_TOKEN)
-		if err != nil {
-			return errorz.Errorf("env.String: %w", err)
-		}
-		cfg.SlackToken = v
+	switch {
+	case cfg.SlackToken != "" && cfg.SlackChannel != "":
+		break
+	case cfg.ImageDir != "":
+		break
+	default:
+		return errorz.Errorf("(%s && %s) || %s: %w", SLACK_TOKEN, SLACK_CHANNEL, IMAGE_DIR, ErrFlagOrEnvIsNotEnough)
 	}
 
-	if cfg.SlackChannel == "" {
-		v, err := env.String(SLACK_CHANNEL)
-		if err != nil {
-			return errorz.Errorf("env.String: %w", err)
-		}
-		cfg.SlackChannel = v
+	if Debug() {
+		log.Printf("[DEBUG] cfg: %#v", cfg)
 	}
-
 	return nil
 }
 
@@ -120,6 +120,7 @@ func ImageFormat() string        { return cfg.ImageFormat }
 func GoogleCloudProject() string { return cfg.GoogleCloudProject }
 func GCPBillingProject() string  { return cfg.GCPBillingProject }
 func GCPBillingTable() string    { return cfg.GCPBillingTable }
+func Message() string            { return cfg.Message }
 func SlackToken() string         { return cfg.SlackToken }
 func SlackChannel() string       { return cfg.SlackChannel }
-func SlackComment() string       { return cfg.SlackComment }
+func ImageDir() string           { return cfg.ImageDir }

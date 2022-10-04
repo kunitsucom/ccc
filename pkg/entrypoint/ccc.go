@@ -10,9 +10,12 @@ import (
 	"github.com/kunitsuinc/ccc/pkg/constz"
 	"github.com/kunitsuinc/ccc/pkg/errorz"
 	"github.com/kunitsuinc/ccc/pkg/infra"
+	"github.com/kunitsuinc/ccc/pkg/infra/local"
+	"github.com/kunitsuinc/ccc/pkg/infra/slack"
 	"github.com/kunitsuinc/ccc/pkg/repository"
 	"github.com/kunitsuinc/ccc/pkg/repository/bigquery"
 	"github.com/kunitsuinc/ccc/pkg/usecase"
+	"github.com/kunitsuinc/util.go/bytez"
 )
 
 func CCC(ctx context.Context) error {
@@ -23,9 +26,10 @@ func CCC(ctx context.Context) error {
 		billingTable   = config.GCPBillingTable()
 		billingProject = config.GCPBillingProject()
 		imageFormat    = config.ImageFormat()
+		message        = config.Message()
 		slackToken     = config.SlackToken()
 		slackChannel   = config.SlackChannel()
-		slackComment   = config.SlackComment()
+		imageDir       = config.ImageDir()
 	)
 
 	var (
@@ -47,9 +51,16 @@ func CCC(ctx context.Context) error {
 		return errorz.Errorf("(*usecase.UseCase).PlotDailyServiceCostGCP: %w", err)
 	}
 
-	i := infra.New(infra.WithSlack(slackToken))
-	if err := i.PostImage(ctx, slackChannel, buf, fmt.Sprintf("%s.%s.%s.%s.%s", projectID, billingProject, billingTable, to.Format(constz.DateOnly), imageFormat), slackComment); err != nil {
-		return errorz.Errorf("(*infra.Infra).PostImage: %w", err)
+	var savers []infra.ImageSaver
+	if slackToken != "" && slackChannel != "" {
+		savers = append(savers, slack.New(slackToken, slackChannel))
+	}
+	if imageDir != "" {
+		savers = append(savers, local.New(imageDir))
+	}
+	i := infra.New(savers)
+	if err := i.SaveImage(ctx, bytez.NewReadSeekBuffer(buf), fmt.Sprintf("%s.%s.%s.%s", billingTable, billingProject, to.Format(constz.DateOnly), imageFormat), message); err != nil {
+		return errorz.Errorf("(*infra.Infra).SaveImage: %w", err)
 	}
 
 	return nil

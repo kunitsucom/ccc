@@ -6,19 +6,29 @@ import (
 	"io"
 
 	"github.com/kunitsuinc/ccc/pkg/errorz"
-	"github.com/kunitsuinc/ccc/pkg/infra/slack"
+	"github.com/kunitsuinc/ccc/pkg/log"
 )
 
-var ErrNoImagePoster = errors.New("no image poster")
+var (
+	ErrImageSaversHaveErrors = errors.New("image savers have errors")
+	ErrNoImageSavers         = errors.New("no image savers")
+)
 
 type Infra struct {
-	slackToken string
+	imageSavers []ImageSaver
+}
+
+type ImageSaver interface {
+	String() string
+	SaveImage(ctx context.Context, image io.Reader, imageName, message string) error
 }
 
 type Option func(i *Infra) *Infra
 
-func New(opts ...Option) *Infra {
-	i := &Infra{}
+func New(imageSavers []ImageSaver, opts ...Option) *Infra {
+	i := &Infra{
+		imageSavers: imageSavers,
+	}
 
 	for _, opt := range opts {
 		i = opt(i)
@@ -27,21 +37,28 @@ func New(opts ...Option) *Infra {
 	return i
 }
 
-func WithSlack(token string) Option {
-	return func(i *Infra) *Infra {
-		i.slackToken = token
-		return i
+func (i *Infra) SaveImage(ctx context.Context, image io.ReadSeeker, imageName, message string) error {
+	if len(i.imageSavers) == 0 {
+		return ErrNoImageSavers
 	}
-}
 
-func (i *Infra) PostImage(ctx context.Context, target string, image io.Reader, imageName, comment string) error {
-	if i.slackToken != "" {
-		s := slack.New(i.slackToken)
-		if err := s.PostImage(ctx, target, image, imageName, comment); err != nil {
-			return errorz.Errorf("(*slack.Slack).PostImage: %w", err)
+	var errs []error
+	for _, saver := range i.imageSavers {
+		if err := saver.SaveImage(ctx, image, imageName, message); err != nil {
+			log.Errorf("(ImageSaver).SaveImage: %s: %v", saver, err)
+			errs = append(errs, err)
+			continue
 		}
-		return nil
+		if _, err := image.Seek(0, io.SeekStart); err != nil {
+			log.Errorf("(io.Seeker).Seek: %v", err)
+			errs = append(errs, err)
+			continue
+		}
 	}
 
-	return ErrNoImagePoster
+	if len(errs) > 0 {
+		return errorz.Errorf("%v: %w", errs, ErrImageSaversHaveErrors)
+	}
+
+	return nil
 }

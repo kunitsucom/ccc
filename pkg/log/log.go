@@ -87,18 +87,37 @@ func extractShortPath(path string) string {
 }
 
 func Debugf(format string, v ...any) {
-	if DefaultLogger == nil || !config.Debug() {
+	if !config.Debug() {
+		return
+	}
+	const prefix = "[DEBUG] "
+	if DefaultLogger == nil {
+		log.Printf("[ERROR] %s", "DefaultLogger is nil")
+		log.Printf(prefix+format, v...)
 		return
 	}
 
-	printf("[DEBUG] ", format, v...)
+	printf(prefix, format, v...)
+}
+
+func Infof(format string, v ...any) {
+	const prefix = "[INFO] "
+	if DefaultLogger == nil {
+		log.Printf("[ERROR] %s", "DefaultLogger is nil")
+		log.Printf(prefix+format, v...)
+		return
+	}
+
+	printf(prefix, format, v...)
 }
 
 func Errorf(format string, v ...any) {
+	const prefix = "[ERROR] "
 	if DefaultLogger == nil {
-		log.Printf("[ERROR] "+format, v...)
+		log.Printf("[ERROR] %s", "DefaultLogger is nil")
+		log.Printf(prefix+format, v...)
 		return
 	}
 
-	printf("[ERROR] ", format, v...)
+	printf(prefix, format, v...)
 }

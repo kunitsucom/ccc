@@ -22,14 +22,16 @@ var (
 )
 
 type Slack struct {
-	token  string
-	client *http.Client
+	token   string
+	channel string
+	client  *http.Client
 }
 
-func New(token string, opts ...Option) *Slack {
+func New(token, channel string, opts ...Option) *Slack {
 	s := &Slack{
-		token:  token,
-		client: new(http.Client),
+		token:   token,
+		channel: channel,
+		client:  new(http.Client),
 	}
 
 	for _, opt := range opts {
@@ -41,8 +43,12 @@ func New(token string, opts ...Option) *Slack {
 
 type Option func(s *Slack) *Slack
 
+func (s *Slack) String() string {
+	return "Slack"
+}
+
 // nolint: cyclop
-func (s *Slack) PostImage(ctx context.Context, slackChannel string, image io.Reader, imageName, comment string) error {
+func (s *Slack) SaveImage(ctx context.Context, image io.Reader, imageName, message string) error {
 	requestBody := &bytes.Buffer{}
 
 	mpw := multipart.NewWriter(requestBody)
@@ -57,12 +63,12 @@ func (s *Slack) PostImage(ctx context.Context, slackChannel string, image io.Rea
 	if err := mpw.WriteField("token", s.token); err != nil {
 		return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
 	}
-	if comment != "" {
-		if err := mpw.WriteField("initial_comment", comment); err != nil {
+	if message != "" {
+		if err := mpw.WriteField("initial_comment", message); err != nil {
 			return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
 		}
 	}
-	if err := mpw.WriteField("channels", slackChannel); err != nil {
+	if err := mpw.WriteField("channels", s.channel); err != nil {
 		return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
 	}
 	if err := mpw.Close(); err != nil {
