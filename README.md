@@ -19,9 +19,10 @@
 
 - Google Cloud Platform
 
-### Notification
+### Method of saving Cost Graph Image
 
-- via Slack
+- Post to Slack
+- Save to local directory
 
 ## TODO
 
