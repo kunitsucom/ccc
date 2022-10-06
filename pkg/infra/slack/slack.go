@@ -3,14 +3,13 @@ package slack
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"regexp"
 	"strings"
 
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 	"github.com/kunitsuinc/util.go/net/http/httputilz"
 )
@@ -54,47 +53,47 @@ func (s *Slack) SaveImage(ctx context.Context, image io.Reader, imageName, messa
 	mpw := multipart.NewWriter(requestBody)
 	part, err := mpw.CreateFormFile("file", imageName)
 	if err != nil {
-		return errorz.Errorf("(*multipart.Writer).CreateFormFile: %w", err)
+		return errors.Errorf("(*multipart.Writer).CreateFormFile: %w", err)
 	}
 
 	if _, err := io.Copy(part, image); err != nil {
-		return errorz.Errorf("(io.Writer).Write: %w", err)
+		return errors.Errorf("(io.Writer).Write: %w", err)
 	}
 	if err := mpw.WriteField("token", s.token); err != nil {
-		return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
+		return errors.Errorf("(*multipart.Writer).WriteField: %w", err)
 	}
 	if message != "" {
 		if err := mpw.WriteField("initial_comment", message); err != nil {
-			return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
+			return errors.Errorf("(*multipart.Writer).WriteField: %w", err)
 		}
 	}
 	if err := mpw.WriteField("channels", s.channel); err != nil {
-		return errorz.Errorf("(*multipart.Writer).WriteField: %w", err)
+		return errors.Errorf("(*multipart.Writer).WriteField: %w", err)
 	}
 	if err := mpw.Close(); err != nil {
-		return errorz.Errorf("(*multipart.Writer).Close: %w", err)
+		return errors.Errorf("(*multipart.Writer).Close: %w", err)
 	}
 
 	requestSlack, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://slack.com/api/files.upload", requestBody)
 	if err != nil {
-		return errorz.Errorf("http.NewRequestWithContext: %w", err)
+		return errors.Errorf("http.NewRequestWithContext: %w", err)
 	}
 	requestSlack.Header.Set("content-type", mpw.FormDataContentType())
 
 	responseSlack, err := s.client.Do(requestSlack)
 	if err != nil {
-		return errorz.Errorf("(*http.Client).Do: %w", err)
+		return errors.Errorf("(*http.Client).Do: %w", err)
 	}
 	defer responseSlack.Body.Close()
 
 	dump, responseBody, err := httputilz.DumpResponse(responseSlack)
 	if err != nil {
-		return errorz.Errorf("httputilz.DumpResponse: %w", err)
+		return errors.Errorf("httputilz.DumpResponse: %w", err)
 	}
 	log.Debugf(string(dump))
 
 	if responseSlack.StatusCode >= 300 || regexSlackAPIError.Match(responseBody.Bytes()) {
-		return errorz.Errorf("%s: %w", strings.ReplaceAll(responseBody.String(), "\n", "\\n"), ErrSlackAPIError)
+		return errors.Errorf("%s: %w", strings.ReplaceAll(responseBody.String(), "\n", "\\n"), ErrSlackAPIError)
 	}
 
 	return nil

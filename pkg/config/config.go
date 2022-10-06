@@ -1,18 +1,17 @@
 package config
 
 import (
-	"errors"
 	"flag"
 	"log"
 	"sync"
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/constz"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/util.go/env"
 )
 
-var ErrFlagOrEnvIsNotEnough = errors.New("flag or environment variable is not enough")
+var ErrFlagOrEnvIsNotEnough = errors.New("config: flag or environment variable is not enough")
 
 // nolint: revive,stylecheck
 const (
@@ -77,7 +76,7 @@ func Check() error {
 	if cfg.GoogleCloudProject == "" {
 		v, err := env.String(GOOGLE_CLOUD_PROJECT)
 		if err != nil {
-			return errorz.Errorf("env.String: %w", err)
+			return errors.Errorf("env.String: %w", err)
 		}
 		cfg.GoogleCloudProject = v
 	}
@@ -85,7 +84,7 @@ func Check() error {
 	if cfg.GCPBillingTable == "" {
 		v, err := env.String(GCP_BILLING_TABLE)
 		if err != nil {
-			return errorz.Errorf("env.String: %w", err)
+			return errors.Errorf("env.String: %w", err)
 		}
 		cfg.GCPBillingTable = v
 	}
@@ -93,7 +92,7 @@ func Check() error {
 	if cfg.GCPBillingProject == "" {
 		v, err := env.String(GCP_BILLING_PROJECT)
 		if err != nil {
-			return errorz.Errorf("env.String: %w", err)
+			return errors.Errorf("env.String: %w", err)
 		}
 		cfg.GCPBillingProject = v
 	}
@@ -104,7 +103,7 @@ func Check() error {
 	case cfg.ImageDir != "":
 		break
 	default:
-		return errorz.Errorf("(%s && %s) || %s: %w", SLACK_TOKEN, SLACK_CHANNEL, IMAGE_DIR, ErrFlagOrEnvIsNotEnough)
+		return errors.Errorf("(%s && %s) || %s: %w", SLACK_TOKEN, SLACK_CHANNEL, IMAGE_DIR, ErrFlagOrEnvIsNotEnough)
 	}
 
 	if Debug() {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/kunitsuinc/ccc/pkg/constz"
 	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 )
 
@@ -54,14 +54,14 @@ func (c *BigQuery) DailyProjectCostGCP(ctx context.Context, billingTable, billin
 		CostThreshold:     costThreshold,
 	})
 	if err != nil {
-		return nil, errorz.Errorf("buildQuery: %w", err)
+		return nil, errors.Errorf("buildQuery: %w", err)
 	}
 
 	log.Debugf("%s", q)
 
 	results, err := query[domain.GCPCost](ctx, c.client, q)
 	if err != nil {
-		return nil, errorz.Errorf("query: %w", err)
+		return nil, errors.Errorf("query: %w", err)
 	}
 
 	return results, nil

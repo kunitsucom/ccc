@@ -3,23 +3,20 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/constz"
 	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
-	"github.com/kunitsuinc/ccc/pkg/log"
+	"github.com/kunitsuinc/ccc/pkg/infra"
 	"github.com/kunitsuinc/ccc/pkg/repository"
-	"github.com/kunitsuinc/util.go/slice"
-	"gonum.org/v1/plot/plotter"
 )
 
-var ErrMixedCurrenciesDataSourceIsNotSupported = errors.New("mixed currencies data source is not supported")
+var ErrMixedCurrenciesDataSourceIsNotSupported = errors.New("usecase: mixed currencies data source is not supported")
 
 type UseCase struct {
-	r *repository.Repository
+	repository RepositoryIF
+	domain     DomainIF
+	infra      InfraIF
 }
 
 type Option func(r *UseCase) *UseCase
@@ -34,56 +31,42 @@ func New(opts ...Option) *UseCase {
 	return u
 }
 
+var _ RepositoryIF = (*repository.Repository)(nil)
+
+type RepositoryIF interface {
+	SUMServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
+	ServicesOrderBySUMServiceCostGCP(googleCloudPlatformServiceSumCost []domain.GCPServiceCost) []string
+	DailyServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
+	DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost
+}
+
 func WithRepository(r *repository.Repository) Option {
 	return func(u *UseCase) *UseCase {
-		u.r = r
+		u.repository = r
 		return u
 	}
 }
 
-func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.Writer, billingTable, billingProject string, from, to time.Time, tz *time.Location, imageFormat string) error {
-	sumServiceCostGCP, err := u.r.SUMServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, 0.01)
-	if err != nil {
-		return errorz.Errorf("(*repository.Repository).SUMServiceCostGCP: %w", err)
-	}
-	servicesOrderBySUMServiceCost := u.r.ServicesOrderBySUMServiceCostGCP(sumServiceCostGCP)
+var _ DomainIF = (*domain.Domain)(nil)
 
-	dailyServiceCostGCP, err := u.r.DailyServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, 0.01)
-	log.Debugf("%v", dailyServiceCostGCP)
-	if err != nil {
-		return errorz.Errorf("(*repository.Repository).DailyServiceCostGCP: %w", err)
-	}
-	currencies := slice.Uniq(slice.Select(dailyServiceCostGCP, func(_ int, s domain.GCPServiceCost) (selected string) { return s.Currency }))
-	if len(currencies) != 1 {
-		return errorz.Errorf("%s: %s: %v: %w", billingTable, billingProject, currencies, ErrMixedCurrenciesDataSourceIsNotSupported)
-	}
-	currency := currencies[0]
-	dailyServiceCostGCPMapByService := u.r.DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCost, dailyServiceCostGCP)
+type DomainIF interface {
+	PlotGraph(target io.Writer, ps *domain.PlotGraphParameters) error
+}
 
-	dailyServiceCostsForPlot := make(map[string]plotter.Values)
-	var xAxisPointsCount int // NOTE: X 軸の数値の数を数える
-	for k, v := range dailyServiceCostGCPMapByService {
-		dailyServiceCostsForPlot[k] = slice.Select(v, func(_ int, source domain.GCPServiceCost) float64 { return source.Cost })
-		if len(v) > xAxisPointsCount {
-			xAxisPointsCount = len(v)
-		}
+func WithDomain(d *domain.Domain) Option {
+	return func(u *UseCase) *UseCase {
+		u.domain = d
+		return u
 	}
+}
 
-	if err := domain.Plot1280x720(
-		target,
-		"\n"+fmt.Sprintf("Google Cloud Platform `%s` Cost (from %s to %s)", billingProject, from.Format(constz.DateOnly), to.Format(constz.DateOnly)),
-		"\n"+fmt.Sprintf("Date (%s)", tz.String()),
-		"\n"+currency,
-		xAxisPointsCount,
-		from,
-		to,
-		tz,
-		servicesOrderBySUMServiceCost,
-		dailyServiceCostsForPlot,
-		imageFormat,
-	); err != nil {
-		return errorz.Errorf("domain.Plot1280x720: %w", err)
+type InfraIF interface {
+	SaveImage(ctx context.Context, image io.ReadSeeker, imageName string, message string) error
+}
+
+func WithInfra(i *infra.Infra) Option {
+	return func(u *UseCase) *UseCase {
+		u.infra = i
+		return u
 	}
-
-	return nil
 }

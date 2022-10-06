@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 	"github.com/kunitsuinc/util.go/osz"
 )
@@ -38,7 +38,7 @@ func (s *Local) SaveImage(ctx context.Context, image io.Reader, imageName, messa
 	s.imageDir = strings.TrimSuffix(s.imageDir, string(os.PathSeparator))
 
 	if err := osz.CheckDir(s.imageDir); err != nil {
-		return errorz.Errorf("osz.CheckDir: %w", err)
+		return errors.Errorf("osz.CheckDir: %w", err)
 	}
 
 	imageFilePath := fmt.Sprintf("%s%s%s", s.imageDir, string(os.PathSeparator), imageName)
@@ -46,15 +46,15 @@ func (s *Local) SaveImage(ctx context.Context, image io.Reader, imageName, messa
 
 	f, err := os.Create(imageFilePath)
 	if err != nil {
-		return errorz.Errorf("os.Create: %w", err)
+		return errors.Errorf("os.Create: %w", err)
 	}
 
 	if _, err := f.ReadFrom(image); err != nil {
-		return errorz.Errorf("(*os.File).ReadFrom: %w", err)
+		return errors.Errorf("(*os.File).ReadFrom: %w", err)
 	}
 
 	if err := f.Sync(); err != nil {
-		return errorz.Errorf("(*os.File).Sync: %w", err)
+		return errors.Errorf("(*os.File).Sync: %w", err)
 	}
 
 	if message != "" {

@@ -3,12 +3,11 @@ package bigquery
 import (
 	"bytes"
 	"context"
-	"errors"
 	"sync"
 	"text/template"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"google.golang.org/api/iterator"
 )
 
@@ -32,7 +31,7 @@ func New(ctx context.Context, projectID string) (*BigQuery, error) {
 		var err error
 		client, err = bigquery.NewClient(ctx, projectID)
 		if err != nil {
-			return nil, errorz.Errorf("bigquery.NewClient: %w", err)
+			return nil, errors.Errorf("bigquery.NewClient: %w", err)
 		}
 
 		bigqueryClients[projectID] = client
@@ -53,7 +52,7 @@ func (c *BigQuery) Renew(ctx context.Context) error {
 		var err error
 		client, err = bigquery.NewClient(ctx, c.projectID)
 		if err != nil {
-			return errorz.Errorf("bigquery.NewClient: %w", err)
+			return errors.Errorf("bigquery.NewClient: %w", err)
 		}
 
 		bigqueryClients[c.projectID] = client
@@ -68,7 +67,7 @@ func buildQuery(tmpl *template.Template, tmplParams any) (string, error) {
 	buf := bytes.NewBuffer(nil)
 
 	if err := tmpl.Execute(buf, tmplParams); err != nil {
-		return "", errorz.Errorf("(*template.Template).Execute: %w", err)
+		return "", errors.Errorf("(*template.Template).Execute: %w", err)
 	}
 
 	return buf.String(), nil
@@ -77,12 +76,12 @@ func buildQuery(tmpl *template.Template, tmplParams any) (string, error) {
 func query[Result any](ctx context.Context, c *bigquery.Client, q string) ([]Result, error) {
 	job, err := c.Query(q).Run(ctx)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.Query).Run: %w", err)
+		return nil, errors.Errorf("(*bigquery.Query).Run: %w", err)
 	}
 
 	ri, err := job.Read(ctx)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.Job).Read: %w", err)
+		return nil, errors.Errorf("(*bigquery.Job).Read: %w", err)
 	}
 
 	results := make([]Result, 0)
@@ -92,7 +91,7 @@ func query[Result any](ctx context.Context, c *bigquery.Client, q string) ([]Res
 			if errors.Is(err, iterator.Done) {
 				break
 			}
-			return nil, errorz.Errorf("(*bigquery.RowIterator).Next: %w", err)
+			return nil, errors.Errorf("(*bigquery.RowIterator).Next: %w", err)
 		}
 
 		results = append(results, result)

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/constz"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 	"github.com/kunitsuinc/util.go/mathz"
 	"github.com/kunitsuinc/util.go/slice"
@@ -17,38 +17,62 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+var ErrPlotGraphParametersIsNil = errors.New("domain: PlotGraphParameters is nil")
+
+type Domain struct{}
+
+type Option func(r *Domain) *Domain
+
+func New(opts ...Option) *Domain {
+	u := &Domain{}
+
+	for _, opt := range opts {
+		u = opt(u)
+	}
+
+	return u
+}
+
+type PlotGraphParameters struct {
+	GraphTitle       string
+	XLabelText       string
+	YLabelText       string
+	Width            float64
+	Hight            float64
+	XAxisPointsCount int
+	From             time.Time
+	To               time.Time
+	TimeZone         *time.Location
+	OrderedLegends   []string
+	LegendValuesMap  map[string]plotter.Values
+	ImageFormat      string
+}
+
 // nolint: cyclop,funlen
-func Plot1280x720(
+func (d *Domain) PlotGraph(
 	target io.Writer,
-	graphTitle string,
-	xLabelText string,
-	yLabelText string,
-	xAxisPointsCount int,
-	from time.Time,
-	to time.Time,
-	tz *time.Location,
-	legends []string,
-	legendValuesMap map[string]plotter.Values,
-	imageFormat string,
+	ps *PlotGraphParameters,
 ) error {
 	mono := font.Font{Typeface: "Liberation", Variant: "Mono"}
 	plot.DefaultFont = mono
 	plotter.DefaultFont = mono
 
 	p := plot.New()
-	p.Title.Text = graphTitle
-	p.X.Label.Text = xLabelText
-	p.Y.Label.Text = yLabelText
+	p.Title.Text = ps.GraphTitle
+	p.X.Label.Text = ps.XLabelText
+	p.Y.Label.Text = ps.YLabelText
 
-	const graphWidth = (1280 / 4) * 3 // NOTE: 1280 pixel / 4 * 3 = 960
-	const graphHight = (graphWidth / 16) * 9
-	barChartWidth := vg.Points((graphWidth - 100) / float64(xAxisPointsCount)) // NOTE: グラフの幅から固定長(95)を引いて X 軸の値数で割る
+	// const graphWidth = (1280 / 4) * 3 // NOTE: 1280 pixel / 4 * 3 = 960
+	// const graphHight = (graphWidth / 16) * 9
+	graphWidth := (ps.Width / 4) * 3 // NOTE: 1280 pixel / 4 * 3 = 960
+	graphHight := (ps.Hight / 4) * 3
+	barChartWidth := vg.Points((graphWidth - 100) / float64(ps.XAxisPointsCount)) // NOTE: グラフの幅から固定長(95)を引いて X 軸の値数で割る
 
 	previousBarChart := (*plotter.BarChart)(nil)
-	for i, legend := range legends {
-		barChart, err := plotter.NewBarChart(legendValuesMap[legend], barChartWidth)
+	for i, legend := range ps.OrderedLegends {
+		barChart, err := plotter.NewBarChart(ps.LegendValuesMap[legend], barChartWidth)
 		if err != nil {
-			return errorz.Errorf("plotter.NewBarChart: %w", err)
+			return errors.Errorf("plotter.NewBarChart: %w", err)
 		}
 		barChart.Width = barChartWidth
 		barChart.LineStyle.Width = vg.Length(0) // NOTE: グラフの枠線の太さを 0 にする
@@ -70,10 +94,10 @@ func Plot1280x720(
 	p.Add(grid)
 
 	var xLabels []string
-	for i := 0; i <= xAxisPointsCount; i++ {
+	for i := 0; i <= ps.XAxisPointsCount; i++ {
 		var x string
 		if i%7 == 1 { // NOTE: 余り 1 -> 1 日前, 1+7 日前, 1+14 日前 1+21 日前にラベルを付与する
-			x = to.In(tz).AddDate(0, 0, -i).Format(constz.DateOnly)
+			x = ps.To.In(ps.TimeZone).AddDate(0, 0, -i).Format(constz.DateOnly)
 			log.Debugf("label: %s", x)
 		}
 		xLabels = append(xLabels, x)
@@ -86,7 +110,7 @@ func Plot1280x720(
 	p.Legend.XOffs = 10
 	p.Legend.YOffs = -10
 	legendHight := float64(p.Legend.TextStyle.Height("C")) * 8
-	legendsHight := legendHight * float64(len(legends))
+	legendsHight := legendHight * float64(len(ps.OrderedLegends))
 	log.Debugf("legendHight=%f, legendsHight=%f", legendHight, legendsHight)
 	p.Y.Min = 0
 	p.Y.Max += legendsHight // NOTE: グラフと Legend が被らないように、 Legend の高さ (文字 C の高さで計算) * Legend 数を足して、 Y 軸の高さを確保している
@@ -118,13 +142,13 @@ func Plot1280x720(
 		return ticks
 	}())
 
-	wt, err := p.WriterTo(graphWidth, graphHight, imageFormat)
+	wt, err := p.WriterTo(font.Length(graphWidth), font.Length(graphHight), ps.ImageFormat)
 	if err != nil {
-		return errorz.Errorf("(*plot.Plot).WriterTo: %w", err)
+		return errors.Errorf("(*plot.Plot).WriterTo: %w", err)
 	}
 
 	if _, err := wt.WriteTo(target); err != nil {
-		return errorz.Errorf("(io.WriterTo).WriteTo: %w", err)
+		return errors.Errorf("(io.WriterTo).WriteTo: %w", err)
 	}
 
 	return nil

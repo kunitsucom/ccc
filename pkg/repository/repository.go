@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/repository/bigquery"
 	"github.com/kunitsuinc/util.go/slice"
 )
@@ -36,7 +36,7 @@ func WithBigQuery(bigquery *bigquery.BigQuery) Option {
 func (r *Repository) SUMServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
 	serviceCost, err := r.bigquery.SUMServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.BigQuery).SUMServiceCostGCP: %w", err)
+		return nil, errors.Errorf("(*bigquery.BigQuery).SUMServiceCostGCP: %w", err)
 	}
 
 	return serviceCost, nil
@@ -45,7 +45,7 @@ func (r *Repository) SUMServiceCostGCP(ctx context.Context, billingTable, billin
 func (r *Repository) DailyServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
 	serviceCost, err := r.bigquery.DailyServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 	if err != nil {
-		return nil, errorz.Errorf("(*bigquery.BigQuery).DailyServiceCostGCP: %w", err)
+		return nil, errors.Errorf("(*bigquery.BigQuery).DailyServiceCostGCP: %w", err)
 	}
 
 	return serviceCost, nil

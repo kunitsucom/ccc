@@ -2,10 +2,9 @@ package infra
 
 import (
 	"context"
-	"errors"
 	"io"
 
-	"github.com/kunitsuinc/ccc/pkg/errorz"
+	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 )
 
@@ -57,7 +56,7 @@ func (i *Infra) SaveImage(ctx context.Context, image io.ReadSeeker, imageName, m
 	}
 
 	if len(errs) > 0 {
-		return errorz.Errorf("%v: %w", errs, ErrImageSaversHaveErrors)
+		return errors.Errorf("%v: %w", errs, ErrImageSaversHaveErrors)
 	}
 
 	return nil
