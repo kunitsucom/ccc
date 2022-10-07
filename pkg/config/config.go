@@ -17,10 +17,10 @@ var ErrFlagOrEnvIsNotEnough = errors.New("config: flag or environment variable i
 const (
 	DEBUG                = "DEBUG"
 	TZ                   = "TZ"
-	DAYS                 = "DAYS"
 	GOOGLE_CLOUD_PROJECT = "GOOGLE_CLOUD_PROJECT"
-	GCP_BILLING_PROJECT  = "GCP_BILLING_PROJECT"
 	GCP_BILLING_TABLE    = "GCP_BILLING_TABLE"
+	GCP_BILLING_PROJECT  = "GCP_BILLING_PROJECT"
+	DAYS                 = "DAYS"
 	IMAGE_FORMAT         = "IMAGE_FORMAT"
 	MESSAGE              = "MESSAGE"
 	SLACK_TOKEN          = "SLACK_TOKEN"
