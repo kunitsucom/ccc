@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kunitsuinc/ccc/pkg/config"
+	"github.com/kunitsuinc/ccc/pkg/domain"
 	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/infra"
 	"github.com/kunitsuinc/ccc/pkg/infra/local"
@@ -40,6 +41,8 @@ func CCC(ctx context.Context) error {
 	}
 	r := repository.New(repository.WithBigQuery(bq))
 
+	d := domain.New()
+
 	var savers []infra.ImageSaver
 	if slackToken != "" && slackChannel != "" {
 		savers = append(savers, slack.New(slackToken, slackChannel))
@@ -49,7 +52,7 @@ func CCC(ctx context.Context) error {
 	}
 	i := infra.New(savers)
 
-	u := usecase.New(usecase.WithRepository(r), usecase.WithInfra(i))
+	u := usecase.New(usecase.WithRepository(r), usecase.WithDomain(d), usecase.WithInfra(i))
 
 	if err := u.PlotDailyServiceCostGCP(
 		ctx,
