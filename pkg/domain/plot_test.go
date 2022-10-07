@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/kunitsuinc/ccc/pkg/constz"
 	"github.com/kunitsuinc/util.go/testz"
+	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 )
 
@@ -36,27 +37,28 @@ func TestPlotGraph(t *testing.T) {
 </g>
 <text x="29.199" y="-32.539" transform="scale(1, -1)"
 	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">0</text>
-<text x="23.198" y="-144.3" transform="scale(1, -1)"
-	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">50</text>
 <text x="17.197" y="-256.07" transform="scale(1, -1)"
 	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">100</text>
-<text x="17.197" y="-367.83" transform="scale(1, -1)"
-	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">150</text>
 <text x="17.197" y="-479.6" transform="scale(1, -1)"
 	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:10px">200</text>
 <path d="M41.201,33.525L49.201,33.525" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M41.201,145.29L49.201,145.29" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M41.201,257.05L49.201,257.05" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M41.201,368.82L49.201,368.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M41.201,480.58L49.201,480.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,78.231L49.201,78.231" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,122.94L49.201,122.94" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,167.64L49.201,167.64" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,212.35L49.201,212.35" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,301.76L49.201,301.76" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,346.47L49.201,346.47" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,391.17L49.201,391.17" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,435.88L49.201,435.88" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M45.201,525.29L49.201,525.29" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M49.201,33.525L49.201,526.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M90.328,33.525L90.328,35.761L950.33,35.761L950.33,33.525Z" style="fill:#FFCABF" />
 <path d="M90.328,35.761L90.328,40.231L950.33,40.231L950.33,35.761Z" style="fill:#FFFF80" />
 <path d="M520.33,33.525L520.33,526.41" style="fill:none;stroke:#808080;stroke-width:0.25" />
 <path d="M80.656,33.525L960,33.525" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
-<path d="M80.656,145.29L960,145.29" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
 <path d="M80.656,257.05L960,257.05" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
-<path d="M80.656,368.82L960,368.82" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
 <path d="M80.656,480.58L960,480.58" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
 <path d="M90.656,502.81L90.656,512.8L110.66,512.8L110.66,502.81Z" style="fill:#FFCABF" />
 <text x="117.86" y="-506.62" transform="scale(1, -1)"
@@ -69,7 +71,7 @@ func TestPlotGraph(t *testing.T) {
 `
 		buf := bytes.NewBuffer(nil)
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
-		d := New()
+		d := New(WithTicker(plot.DefaultTicks{}))
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
 			GraphTitle:       "Title",
 			XLabelText:       "XLabel",
@@ -92,6 +94,7 @@ func TestPlotGraph(t *testing.T) {
 		actual := buf.String()
 		if expect != actual {
 			t.Errorf("expect != actual:\n%s", cmp.Diff(expect, actual))
+			t.Errorf("actual:\n%s", actual)
 		}
 	})
 

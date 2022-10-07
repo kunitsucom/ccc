@@ -19,7 +19,9 @@ import (
 
 var ErrPlotGraphParametersIsNil = errors.New("domain: PlotGraphParameters is nil")
 
-type Domain struct{}
+type Domain struct {
+	ticker plot.Ticker
+}
 
 type Option func(r *Domain) *Domain
 
@@ -31,6 +33,14 @@ func New(opts ...Option) *Domain {
 	}
 
 	return u
+}
+
+func WithTicker(ticker plot.Ticker) Option {
+	return func(d *Domain) *Domain {
+		d.ticker = ticker
+
+		return d
+	}
 }
 
 type PlotGraphParameters struct {
@@ -114,33 +124,10 @@ func (d *Domain) PlotGraph(
 	log.Debugf("legendHight=%f, legendsHight=%f", legendHight, legendsHight)
 	p.Y.Min = 0
 	p.Y.Max += legendsHight // NOTE: グラフと Legend が被らないように、 Legend の高さ (文字 C の高さで計算) * Legend 数を足して、 Y 軸の高さを確保している
-	p.Y.Tick.Marker = plot.ConstantTicks(func() []plot.Tick {
-		var ticks []plot.Tick
-		unit := func() int { // NOTE: どの単位で Y 軸グリッドを入れるか。 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, ... のどれかが入る
-			unit := 1
-			for i := p.Y.Max; i > 10; i = p.Y.Max / float64(unit) {
-				if mathz.IsPow10(float64(unit)) {
-					unit *= 5
-					continue
-				}
-				unit *= 2
-			}
-			return unit
-		}()
-		numOfYGrid := int(p.Y.Max / float64(unit)) // NOTE: グラフ内に何本 Y 軸 grid を入れるか
-		for i := 0; i <= numOfYGrid; i++ {
-			value := unit * i
-			ticks = append(
-				ticks,
-				plot.Tick{
-					// NOTE: unit==500 の場合は 500, 1000, 1500, 2000, ... に Y 軸グリッドを書き込む
-					Label: strconv.Itoa(value),
-					Value: float64(value),
-				},
-			)
-		}
-		return ticks
-	}())
+	p.Y.Tick.Marker = d.ticker
+	if p.Y.Tick.Marker == nil {
+		p.Y.Tick.Marker = MultipleOf5Ticker(p.Y.Max)
+	}
 
 	wt, err := p.WriterTo(font.Length(graphWidth), font.Length(graphHight), ps.ImageFormat)
 	if err != nil {
@@ -152,4 +139,35 @@ func (d *Domain) PlotGraph(
 	}
 
 	return nil
+}
+
+func MultipleOf5Ticker(yMax float64) plot.ConstantTicks {
+	var ticks []plot.Tick
+	unit := func() int { // NOTE: どの単位で Y 軸グリッドを入れるか。 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, ... のどれかが入る
+		unit := 1
+		for i := yMax; i > 10; i = yMax / float64(unit) {
+			if mathz.IsPow10(float64(unit)) {
+				unit *= 5
+				continue
+			}
+			unit *= 2
+		}
+		return unit
+	}()
+
+	numOfYGrid := int(yMax / float64(unit)) // NOTE: グラフ内に何本 Y 軸 grid を入れるか
+
+	for i := 0; i <= numOfYGrid; i++ {
+		value := unit * i
+		ticks = append(
+			ticks,
+			plot.Tick{
+				// NOTE: unit==500 の場合は 500, 1000, 1500, 2000, ... に Y 軸グリッドを書き込む
+				Label: strconv.Itoa(value),
+				Value: float64(value),
+			},
+		)
+	}
+
+	return plot.ConstantTicks(ticks)
 }

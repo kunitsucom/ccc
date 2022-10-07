@@ -38,6 +38,7 @@ func New(imageSavers []ImageSaver, opts ...Option) *Infra {
 
 func (i *Infra) SaveImage(ctx context.Context, image io.ReadSeeker, imageName, message string) error {
 	if len(i.imageSavers) == 0 {
+		// nolint: wrapcheck
 		return ErrNoImageSavers
 	}
 
