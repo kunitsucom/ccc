@@ -43,10 +43,10 @@ Download ccc for your execution environment as follows:
 
 ```bash
 # download
-curl -fLROSs https://github.com/kunitsuinc/ccc/releases/download/v0.0.4/ccc_v0.0.4_darwin_arm64.zip
+curl -fLROSs https://github.com/kunitsuinc/ccc/releases/download/v0.0.5/ccc_v0.0.5_darwin_arm64.zip
 
 # unzip
-unzip -j ccc_v0.0.4_darwin_arm64.zip '*/ccc'
+unzip -j ccc_v0.0.5_darwin_arm64.zip '*/ccc'
 ```
 
 #### 1-3. Run ccc
