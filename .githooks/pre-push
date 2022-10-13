@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
+set -Eeu -o pipefail
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
-cd "${REPO_ROOT:?}" || exit 1
+__main__() {
+  if ! cd "${REPO_ROOT:?}"; then
+    return 1
+  fi
 
-make ci
+  make ci
+}

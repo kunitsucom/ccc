@@ -16,20 +16,14 @@ type repositoryMock struct {
 	SUMServiceCostGCP_GCPServiceCost []domain.GCPServiceCost
 	SUMServiceCostGCP_error          error
 
-	ServicesOrderBySUMServiceCostGCP_slice_string []string
-
 	DailyServiceCostGCP_GCPServiceCost []domain.GCPServiceCost
 	DailyServiceCostGCP_error          error
 
 	DailyServiceCostGCPMapByService_map_string_GCPServiceCost map[string][]domain.GCPServiceCost
 }
 
-func (m *repositoryMock) SUMServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+func (m *repositoryMock) SUMServiceCostGCPAsc(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
 	return m.SUMServiceCostGCP_GCPServiceCost, m.SUMServiceCostGCP_error
-}
-
-func (m *repositoryMock) ServicesOrderBySUMServiceCostGCP(googleCloudPlatformServiceSumCost []domain.GCPServiceCost) []string {
-	return m.ServicesOrderBySUMServiceCostGCP_slice_string
 }
 
 func (m *repositoryMock) DailyServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {

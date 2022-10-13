@@ -54,16 +54,16 @@ func TestPlotGraph(t *testing.T) {
 <path d="M45.201,435.88L49.201,435.88" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M45.201,525.29L49.201,525.29" style="fill:none;stroke:#000000;stroke-width:0.5" />
 <path d="M49.201,33.525L49.201,526.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
-<path d="M90.328,33.525L90.328,35.761L950.33,35.761L950.33,33.525Z" style="fill:#FFCABF" />
-<path d="M90.328,35.761L90.328,40.231L950.33,40.231L950.33,35.761Z" style="fill:#FFFF80" />
+<path d="M90.328,33.525L90.328,35.761L950.33,35.761L950.33,33.525Z" style="fill:#FFFF80" />
+<path d="M90.328,35.761L90.328,40.231L950.33,40.231L950.33,35.761Z" style="fill:#FFCABF" />
 <path d="M520.33,33.525L520.33,526.41" style="fill:none;stroke:#808080;stroke-width:0.25" />
 <path d="M80.656,33.525L960,33.525" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
 <path d="M80.656,257.05L960,257.05" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
 <path d="M80.656,480.58L960,480.58" style="fill:none;stroke:#000000;stroke-width:0.25;stroke-dasharray:5" />
-<path d="M90.656,502.81L90.656,512.8L110.66,512.8L110.66,502.81Z" style="fill:#FFCABF" />
+<path d="M90.656,502.81L90.656,512.8L110.66,512.8L110.66,502.81Z" style="fill:#FFFF80" />
 <text x="117.86" y="-506.62" transform="scale(1, -1)"
 	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:12px">legend1</text>
-<path d="M90.656,492.82L90.656,502.81L110.66,502.81L110.66,492.82Z" style="fill:#FFFF80" />
+<path d="M90.656,492.82L90.656,502.81L110.66,502.81L110.66,492.82Z" style="fill:#FFCABF" />
 <text x="117.86" y="-496.63" transform="scale(1, -1)"
 	style="font-family:Liberation Mono;font-variant:normal;font-weight:normal;font-style:normal;font-size:12px">legend2</text>
 </g>
@@ -73,16 +73,16 @@ func TestPlotGraph(t *testing.T) {
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
 		d := New(WithTicker(plot.DefaultTicks{}))
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
-			GraphTitle:       "Title",
-			XLabelText:       "XLabel",
-			YLabelText:       "YLabel",
-			Width:            1280,
-			Hight:            720,
-			XAxisPointsCount: 1,
-			From:             from,
-			To:               from.AddDate(0, 0, 1),
-			TimeZone:         constz.TimeZone("Asia/Tokyo"),
-			OrderedLegends:   []string{"legend1", "legend2"},
+			GraphTitle:        "Title",
+			XLabelText:        "XLabel",
+			YLabelText:        "YLabel",
+			Width:             1280,
+			Hight:             720,
+			XAxisPointsCount:  1,
+			From:              from,
+			To:                from.AddDate(0, 0, 1),
+			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
 				"legend2": []float64{2},
@@ -103,16 +103,16 @@ func TestPlotGraph(t *testing.T) {
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
 		d := New()
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
-			GraphTitle:       "Title",
-			XLabelText:       "XLabel",
-			YLabelText:       "YLabel",
-			Width:            1280,
-			Hight:            720,
-			XAxisPointsCount: 1,
-			From:             from,
-			To:               from.AddDate(0, 0, 1),
-			TimeZone:         constz.TimeZone("Asia/Tokyo"),
-			OrderedLegends:   []string{"NoData"},
+			GraphTitle:        "Title",
+			XLabelText:        "XLabel",
+			YLabelText:        "YLabel",
+			Width:             1280,
+			Hight:             720,
+			XAxisPointsCount:  1,
+			From:              from,
+			To:                from.AddDate(0, 0, 1),
+			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			OrderedLegendsAsc: []string{"NoData"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
 			},
@@ -127,16 +127,16 @@ func TestPlotGraph(t *testing.T) {
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
 		d := New()
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
-			GraphTitle:       "Title",
-			XLabelText:       "XLabel",
-			YLabelText:       "YLabel",
-			Width:            1280,
-			Hight:            720,
-			XAxisPointsCount: 1,
-			From:             from,
-			To:               from.AddDate(0, 0, 1),
-			TimeZone:         constz.TimeZone("Asia/Tokyo"),
-			OrderedLegends:   []string{"legend1", "legend2"},
+			GraphTitle:        "Title",
+			XLabelText:        "XLabel",
+			YLabelText:        "YLabel",
+			Width:             1280,
+			Hight:             720,
+			XAxisPointsCount:  1,
+			From:              from,
+			To:                from.AddDate(0, 0, 1),
+			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
 				"legend2": []float64{2},
@@ -152,16 +152,16 @@ func TestPlotGraph(t *testing.T) {
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
 		d := New()
 		err := d.PlotGraph(rw, &PlotGraphParameters{
-			GraphTitle:       "Title",
-			XLabelText:       "XLabel",
-			YLabelText:       "YLabel",
-			Width:            1280,
-			Hight:            720,
-			XAxisPointsCount: 1,
-			From:             from,
-			To:               from.AddDate(0, 0, 1),
-			TimeZone:         constz.TimeZone("Asia/Tokyo"),
-			OrderedLegends:   []string{"legend1", "legend2"},
+			GraphTitle:        "Title",
+			XLabelText:        "XLabel",
+			YLabelText:        "YLabel",
+			Width:             1280,
+			Hight:             720,
+			XAxisPointsCount:  1,
+			From:              from,
+			To:                from.AddDate(0, 0, 1),
+			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
 				"legend2": []float64{2},

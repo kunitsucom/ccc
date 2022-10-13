@@ -44,18 +44,18 @@ func WithTicker(ticker plot.Ticker) Option {
 }
 
 type PlotGraphParameters struct {
-	GraphTitle       string
-	XLabelText       string
-	YLabelText       string
-	Width            float64
-	Hight            float64
-	XAxisPointsCount int
-	From             time.Time
-	To               time.Time
-	TimeZone         *time.Location
-	OrderedLegends   []string
-	LegendValuesMap  map[string]plotter.Values
-	ImageFormat      string
+	GraphTitle        string
+	XLabelText        string
+	YLabelText        string
+	Width             float64
+	Hight             float64
+	XAxisPointsCount  int
+	From              time.Time
+	To                time.Time
+	TimeZone          *time.Location
+	OrderedLegendsAsc []string
+	LegendValuesMap   map[string]plotter.Values
+	ImageFormat       string
 }
 
 // nolint: cyclop,funlen
@@ -79,14 +79,14 @@ func (d *Domain) PlotGraph(
 	barChartWidth := vg.Points((graphWidth - 100) / float64(ps.XAxisPointsCount)) // NOTE: グラフの幅から固定長(95)を引いて X 軸の値数で割る
 
 	previousBarChart := (*plotter.BarChart)(nil)
-	for i, legend := range ps.OrderedLegends {
+	for i, legend := range ps.OrderedLegendsAsc {
 		barChart, err := plotter.NewBarChart(ps.LegendValuesMap[legend], barChartWidth)
 		if err != nil {
 			return errors.Errorf("plotter.NewBarChart: %w", err)
 		}
 		barChart.Width = barChartWidth
 		barChart.LineStyle.Width = vg.Length(0) // NOTE: グラフの枠線の太さを 0 にする
-		barChart.Color = constz.GraphColor(i)
+		barChart.Color = constz.GraphColor(len(ps.OrderedLegendsAsc) - 1 - i)
 		p.Legend.Add(legend, barChart)
 
 		if previousBarChart != nil {
@@ -120,7 +120,7 @@ func (d *Domain) PlotGraph(
 	p.Legend.XOffs = 10
 	p.Legend.YOffs = -10
 	legendHight := float64(p.Legend.TextStyle.Height("C")) * 8
-	legendsHight := legendHight * float64(len(ps.OrderedLegends))
+	legendsHight := legendHight * float64(len(ps.OrderedLegendsAsc))
 	log.Debugf("legendHight=%f, legendsHight=%f", legendHight, legendsHight)
 	p.Y.Min = 0
 	p.Y.Max += legendsHight // NOTE: グラフと Legend が被らないように、 Legend の高さ (文字 C の高さで計算) * Legend 数を足して、 Y 軸の高さを確保している

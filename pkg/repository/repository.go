@@ -33,13 +33,13 @@ func WithBigQuery(bigquery *bigquery.BigQuery) Option {
 	}
 }
 
-func (r *Repository) SUMServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
-	serviceCost, err := r.bigquery.SUMServiceCostGCP(ctx, billingTable, billingProject, from, to, tz, costThreshold)
+func (r *Repository) SUMServiceCostGCPAsc(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+	serviceCostAsc, err := r.bigquery.SUMServiceCostGCPAsc(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 	if err != nil {
 		return nil, errors.Errorf("(*bigquery.BigQuery).SUMServiceCostGCP: %w", err)
 	}
 
-	return serviceCost, nil
+	return serviceCostAsc, nil
 }
 
 func (r *Repository) DailyServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
@@ -49,20 +49,6 @@ func (r *Repository) DailyServiceCostGCP(ctx context.Context, billingTable, bill
 	}
 
 	return serviceCost, nil
-}
-
-func (r *Repository) ServicesOrderBySUMServiceCostGCP(googleCloudPlatformServiceSumCost []domain.GCPServiceCost) []string {
-	return slice.Uniq(
-		slice.Select(
-			slice.Sort(
-				googleCloudPlatformServiceSumCost,
-				func(a, b domain.GCPServiceCost) bool { return a.Cost > b.Cost },
-			),
-			func(index int, source domain.GCPServiceCost) (selected string) {
-				return source.Service
-			},
-		),
-	)
 }
 
 func (r *Repository) DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {

@@ -34,8 +34,7 @@ func New(opts ...Option) *UseCase {
 var _ RepositoryIF = (*repository.Repository)(nil)
 
 type RepositoryIF interface {
-	SUMServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
-	ServicesOrderBySUMServiceCostGCP(googleCloudPlatformServiceSumCost []domain.GCPServiceCost) []string
+	SUMServiceCostGCPAsc(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 	DailyServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 	DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost
 }

@@ -34,17 +34,17 @@ WHERE
 AND
     DATE(usage_start_time, '{{ .TimeZone }}') >= DATE("{{ .From }}", '{{ .TimeZone }}')
 AND
-    DATE(usage_start_time, '{{ .TimeZone }}') <= DATE("{{ .To }}", '{{ .TimeZone }}')
+    DATE(usage_start_time, '{{ .TimeZone }}') < DATE("{{ .To }}", '{{ .TimeZone }}')
 AND
     cost >= {{ .CostThreshold }}
 GROUP BY
     service, currency
 ORDER BY
     cost
-DESC
+ASC
 ;`))
 
-func (c *BigQuery) SUMServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+func (c *BigQuery) SUMServiceCostGCPAsc(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
 	q, err := buildQuery(sumServiceCostGCPTemplate, sumServiceCostGCPParameter{
 		TimeZone:          tz,
 		GCPBillingTable:   billingTable,
@@ -59,10 +59,10 @@ func (c *BigQuery) SUMServiceCostGCP(ctx context.Context, billingTable, billingP
 
 	log.Debugf("%s", q)
 
-	results, err := query[domain.GCPServiceCost](ctx, c.client, q)
+	serviceCostAsc, err := query[domain.GCPServiceCost](ctx, c.client, q)
 	if err != nil {
 		return nil, errors.Errorf("query: %w", err)
 	}
 
-	return results, nil
+	return serviceCostAsc, nil
 }

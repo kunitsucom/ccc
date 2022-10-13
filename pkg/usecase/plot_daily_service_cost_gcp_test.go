@@ -22,7 +22,6 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 			repository: &repositoryMock{
 				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				SUMServiceCostGCP_error:                                   nil,
-				ServicesOrderBySUMServiceCostGCP_slice_string:             []string{"test-project"},
 				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				DailyServiceCostGCP_error:                                 nil,
 				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
@@ -62,10 +61,9 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost:              tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				SUMServiceCostGCP_error:                       nil,
-				ServicesOrderBySUMServiceCostGCP_slice_string: []string{"test-project"},
-				DailyServiceCostGCP_error:                     testz.ErrTestError,
+				SUMServiceCostGCP_GCPServiceCost: tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
+				SUMServiceCostGCP_error:          nil,
+				DailyServiceCostGCP_error:        testz.ErrTestError,
 			},
 		}
 		ctx := context.Background()
@@ -82,7 +80,6 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 			repository: &repositoryMock{
 				SUMServiceCostGCP_GCPServiceCost:                          append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...),
 				SUMServiceCostGCP_error:                                   nil,
-				ServicesOrderBySUMServiceCostGCP_slice_string:             []string{"test-project"},
 				DailyServiceCostGCP_GCPServiceCost:                        append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...),
 				DailyServiceCostGCP_error:                                 nil,
 				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
@@ -102,7 +99,6 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 			repository: &repositoryMock{
 				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				SUMServiceCostGCP_error:                                   nil,
-				ServicesOrderBySUMServiceCostGCP_slice_string:             []string{"test-project"},
 				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				DailyServiceCostGCP_error:                                 nil,
 				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
@@ -125,7 +121,6 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 			repository: &repositoryMock{
 				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				SUMServiceCostGCP_error:                                   nil,
-				ServicesOrderBySUMServiceCostGCP_slice_string:             []string{"test-project"},
 				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
 				DailyServiceCostGCP_error:                                 nil,
 				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},

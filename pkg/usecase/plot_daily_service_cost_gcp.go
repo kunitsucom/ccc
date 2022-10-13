@@ -26,11 +26,11 @@ type PlotDailyServiceCostGCPParameters struct {
 }
 
 func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWriter, ps *PlotDailyServiceCostGCPParameters) error {
-	sumServiceCostGCP, err := u.repository.SUMServiceCostGCP(ctx, ps.BillingTable, ps.BillingProject, ps.From, ps.To, ps.TimeZone, 0.01)
+	sumServiceCostGCPAsc, err := u.repository.SUMServiceCostGCPAsc(ctx, ps.BillingTable, ps.BillingProject, ps.From, ps.To, ps.TimeZone, 0.01)
 	if err != nil {
 		return errors.Errorf("(RepositoryIF).SUMServiceCostGCP: %w", err)
 	}
-	servicesOrderBySUMServiceCost := u.repository.ServicesOrderBySUMServiceCostGCP(sumServiceCostGCP)
+	servicesOrderBySUMServiceCostAsc := slice.Select(sumServiceCostGCPAsc, func(idx int, source domain.GCPServiceCost) string { return source.Service })
 
 	dailyServiceCostGCP, err := u.repository.DailyServiceCostGCP(ctx, ps.BillingTable, ps.BillingProject, ps.From, ps.To, ps.TimeZone, 0.01)
 	log.Debugf("%v", dailyServiceCostGCP)
@@ -42,12 +42,14 @@ func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWri
 		return errors.Errorf("%s: %s: %v: %w", ps.BillingTable, ps.BillingProject, currencies, ErrMixedCurrenciesDataSourceIsNotSupported)
 	}
 	currency := currencies[0]
-	dailyServiceCostGCPMapByService := u.repository.DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCost, dailyServiceCostGCP)
+	dailyServiceCostGCPMapByService := u.repository.DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostAsc, dailyServiceCostGCP)
 
 	dailyServiceCostsForPlot := make(map[string]plotter.Values)
 	var xAxisPointsCount int // NOTE: X 軸の数値の数を数える
 	for k, v := range dailyServiceCostGCPMapByService {
 		dailyServiceCostsForPlot[k] = slice.Select(v, func(_ int, source domain.GCPServiceCost) float64 { return source.Cost })
+
+		log.Debugf("%s: data count: %d", k, len(v))
 		if len(v) > xAxisPointsCount {
 			xAxisPointsCount = len(v)
 		}
@@ -56,18 +58,18 @@ func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWri
 	if err := u.domain.PlotGraph(
 		target,
 		&domain.PlotGraphParameters{
-			GraphTitle:       "\n" + fmt.Sprintf("Google Cloud Platform `%s` Cost (from %s to %s)", ps.BillingProject, ps.From.Format(constz.DateOnly), ps.To.Format(constz.DateOnly)),
-			XLabelText:       "\n" + fmt.Sprintf("Date (%s)", ps.TimeZone.String()),
-			YLabelText:       "\n" + currency,
-			Width:            1280,
-			Hight:            720,
-			XAxisPointsCount: xAxisPointsCount,
-			From:             ps.From,
-			To:               ps.To,
-			TimeZone:         ps.TimeZone,
-			OrderedLegends:   servicesOrderBySUMServiceCost,
-			LegendValuesMap:  dailyServiceCostsForPlot,
-			ImageFormat:      ps.ImageFormat,
+			GraphTitle:        "\n" + fmt.Sprintf("Google Cloud Platform `%s` Cost (from %s to %s)", ps.BillingProject, ps.From.Format(constz.DateOnly), ps.To.Format(constz.DateOnly)),
+			XLabelText:        "\n" + fmt.Sprintf("Date (%s)", ps.TimeZone.String()),
+			YLabelText:        "\n" + currency,
+			Width:             1280,
+			Hight:             720,
+			XAxisPointsCount:  xAxisPointsCount,
+			From:              ps.From,
+			To:                ps.To,
+			TimeZone:          ps.TimeZone,
+			OrderedLegendsAsc: servicesOrderBySUMServiceCostAsc,
+			LegendValuesMap:   dailyServiceCostsForPlot,
+			ImageFormat:       ps.ImageFormat,
 		},
 	); err != nil {
 		return errors.Errorf("(DomainIF).PlotGraph: %w", err)

@@ -35,14 +35,14 @@ WHERE
 AND
     DATE(usage_start_time, '{{ .TimeZone }}') >= DATE("{{ .From }}", '{{ .TimeZone }}')
 AND
-    DATE(usage_start_time, '{{ .TimeZone }}') <= DATE("{{ .To }}", '{{ .TimeZone }}')
+    DATE(usage_start_time, '{{ .TimeZone }}') < DATE("{{ .To }}", '{{ .TimeZone }}')
 AND
     cost >= {{ .CostThreshold }}
 GROUP BY
     day, service, currency
 ORDER BY
-    cost
-DESC
+    day
+ASC
 ;`))
 
 func (c *BigQuery) DailyServiceCostGCP(ctx context.Context, billingTable, billingProject string, from, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
