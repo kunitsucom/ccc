@@ -1,4 +1,4 @@
-package constz
+package consts
 
 type Color struct {
 	Name       string

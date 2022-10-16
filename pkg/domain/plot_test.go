@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kunitsuinc/ccc/pkg/constz"
+	"github.com/kunitsuinc/ccc/pkg/consts"
 	"github.com/kunitsuinc/util.go/testz"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -70,7 +70,7 @@ func TestPlotGraph(t *testing.T) {
 </svg>
 `
 		buf := bytes.NewBuffer(nil)
-		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
+		from := time.Date(2022, 2, 2, 2, 22, 22, 0, consts.TimeZone("Asia/Tokyo"))
 		d := New(WithTicker(plot.DefaultTicks{}))
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
 			GraphTitle:        "Title",
@@ -81,7 +81,7 @@ func TestPlotGraph(t *testing.T) {
 			XAxisPointsCount:  1,
 			From:              from,
 			To:                from.AddDate(0, 0, 1),
-			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			TimeZone:          consts.TimeZone("Asia/Tokyo"),
 			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
@@ -100,7 +100,7 @@ func TestPlotGraph(t *testing.T) {
 
 	t.Run("failure(NoData)", func(t *testing.T) {
 		buf := bytes.NewBuffer(nil)
-		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
+		from := time.Date(2022, 2, 2, 2, 22, 22, 0, consts.TimeZone("Asia/Tokyo"))
 		d := New()
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
 			GraphTitle:        "Title",
@@ -111,7 +111,7 @@ func TestPlotGraph(t *testing.T) {
 			XAxisPointsCount:  1,
 			From:              from,
 			To:                from.AddDate(0, 0, 1),
-			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			TimeZone:          consts.TimeZone("Asia/Tokyo"),
 			OrderedLegendsAsc: []string{"NoData"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
@@ -124,7 +124,7 @@ func TestPlotGraph(t *testing.T) {
 
 	t.Run("failure(InvalidImageFormat)", func(t *testing.T) {
 		buf := bytes.NewBuffer(nil)
-		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
+		from := time.Date(2022, 2, 2, 2, 22, 22, 0, consts.TimeZone("Asia/Tokyo"))
 		d := New()
 		if err := d.PlotGraph(buf, &PlotGraphParameters{
 			GraphTitle:        "Title",
@@ -135,7 +135,7 @@ func TestPlotGraph(t *testing.T) {
 			XAxisPointsCount:  1,
 			From:              from,
 			To:                from.AddDate(0, 0, 1),
-			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			TimeZone:          consts.TimeZone("Asia/Tokyo"),
 			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},
@@ -149,7 +149,7 @@ func TestPlotGraph(t *testing.T) {
 
 	t.Run("failure(InvalidImageFormat)", func(t *testing.T) {
 		rw := testz.NewReadWriter(0, testz.ErrTestError)
-		from := time.Date(2022, 2, 2, 2, 22, 22, 0, constz.TimeZone("Asia/Tokyo"))
+		from := time.Date(2022, 2, 2, 2, 22, 22, 0, consts.TimeZone("Asia/Tokyo"))
 		d := New()
 		err := d.PlotGraph(rw, &PlotGraphParameters{
 			GraphTitle:        "Title",
@@ -160,7 +160,7 @@ func TestPlotGraph(t *testing.T) {
 			XAxisPointsCount:  1,
 			From:              from,
 			To:                from.AddDate(0, 0, 1),
-			TimeZone:          constz.TimeZone("Asia/Tokyo"),
+			TimeZone:          consts.TimeZone("Asia/Tokyo"),
 			OrderedLegendsAsc: []string{"legend1", "legend2"},
 			LegendValuesMap: map[string]plotter.Values{
 				"legend1": []float64{1},

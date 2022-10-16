@@ -6,7 +6,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/constz"
+	"github.com/kunitsuinc/ccc/pkg/consts"
 	"github.com/kunitsuinc/ccc/pkg/domain"
 	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
@@ -49,8 +49,8 @@ func (c *BigQuery) DailyProjectCostGCP(ctx context.Context, billingTable, billin
 		TimeZone:          tz,
 		GCPBillingTable:   billingTable,
 		GCPBillingProject: billingProject,
-		From:              from.Format(constz.DateOnly),
-		To:                to.Format(constz.DateOnly),
+		From:              from.Format(consts.DateOnly),
+		To:                to.Format(consts.DateOnly),
 		CostThreshold:     costThreshold,
 	})
 	if err != nil {

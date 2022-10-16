@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/constz"
+	"github.com/kunitsuinc/ccc/pkg/consts"
 	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/util.go/env"
 )
@@ -68,7 +68,7 @@ func Load() {
 	flag.StringVar(&cfg.ImageDir, "image-dir", env.StringOrDefault(IMAGE_DIR, ""), "Directory to save image file")
 	flag.Parse()
 
-	cfg.TimeZone = constz.TimeZone(tz)
+	cfg.TimeZone = consts.TimeZone(tz)
 }
 
 // nolint: cyclop

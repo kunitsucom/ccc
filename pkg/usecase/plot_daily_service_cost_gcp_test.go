@@ -52,8 +52,8 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		ctx := context.Background()
 		buf := bytes.NewBuffer(nil)
 		err := u.PlotDailyServiceCostGCP(ctx, buf, &PlotDailyServiceCostGCPParameters{})
-		if !errorz.Contains(err, "(RepositoryIF).SUMServiceCostGCP") {
-			t.Errorf("err not contain (RepositoryIF).SUMServiceCostGCP: %v", err)
+		if !errorz.Contains(err, "(IRepository).SUMServiceCostGCP") {
+			t.Errorf("err not contain (IRepository).SUMServiceCostGCP: %v", err)
 		}
 	})
 
@@ -69,8 +69,8 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		ctx := context.Background()
 		buf := bytes.NewBuffer(nil)
 		err := u.PlotDailyServiceCostGCP(ctx, buf, &PlotDailyServiceCostGCPParameters{})
-		if !errorz.Contains(err, "(RepositoryIF).DailyServiceCostGCP") {
-			t.Errorf("err not contain (RepositoryIF).DailyServiceCostGCP: %v", err)
+		if !errorz.Contains(err, "(IRepository).DailyServiceCostGCP") {
+			t.Errorf("err not contain (IRepository).DailyServiceCostGCP: %v", err)
 		}
 	})
 
@@ -110,8 +110,8 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		ctx := context.Background()
 		buf := bytes.NewBuffer(nil)
 		err := u.PlotDailyServiceCostGCP(ctx, buf, &PlotDailyServiceCostGCPParameters{})
-		if !errorz.Contains(err, "(DomainIF).PlotGraph") {
-			t.Errorf("err not contain (DomainIF).PlotGraph: %v", err)
+		if !errorz.Contains(err, "(IDomain).PlotGraph") {
+			t.Errorf("err not contain (IDomain).PlotGraph: %v", err)
 		}
 	})
 
@@ -135,8 +135,8 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		ctx := context.Background()
 		buf := bytes.NewBuffer(nil)
 		err := u.PlotDailyServiceCostGCP(ctx, buf, &PlotDailyServiceCostGCPParameters{})
-		if !errorz.Contains(err, "(InfraIF).SaveImage") {
-			t.Errorf("err not contain (InfraIF).SaveImage: %v", err)
+		if !errorz.Contains(err, "(IInfra).SaveImage") {
+			t.Errorf("err not contain (IInfra).SaveImage: %v", err)
 		}
 	})
 }

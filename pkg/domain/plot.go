@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/constz"
+	"github.com/kunitsuinc/ccc/pkg/consts"
 	"github.com/kunitsuinc/ccc/pkg/errors"
 	"github.com/kunitsuinc/ccc/pkg/log"
 	"github.com/kunitsuinc/util.go/mathz"
@@ -86,7 +86,7 @@ func (d *Domain) PlotGraph(
 		}
 		barChart.Width = barChartWidth
 		barChart.LineStyle.Width = vg.Length(0) // NOTE: グラフの枠線の太さを 0 にする
-		barChart.Color = constz.GraphColor(len(ps.OrderedLegendsAsc) - 1 - i)
+		barChart.Color = consts.GraphColor(len(ps.OrderedLegendsAsc) - 1 - i)
 		p.Legend.Add(legend, barChart)
 
 		if previousBarChart != nil {
@@ -107,7 +107,7 @@ func (d *Domain) PlotGraph(
 	for i := 0; i <= ps.XAxisPointsCount; i++ {
 		var x string
 		if i%7 == 1 { // NOTE: 余り 1 -> 1 日前, 1+7 日前, 1+14 日前 1+21 日前にラベルを付与する
-			x = ps.To.In(ps.TimeZone).AddDate(0, 0, -i).Format(constz.DateOnly)
+			x = ps.To.In(ps.TimeZone).AddDate(0, 0, -i).Format(consts.DateOnly)
 			log.Debugf("label: %s", x)
 		}
 		xLabels = append(xLabels, x)

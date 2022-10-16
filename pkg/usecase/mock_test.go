@@ -9,7 +9,7 @@ import (
 	"github.com/kunitsuinc/ccc/pkg/domain"
 )
 
-var _ RepositoryIF = (*repositoryMock)(nil)
+var _ IRepository = (*repositoryMock)(nil)
 
 // nolint: revive,stylecheck
 type repositoryMock struct {
@@ -34,7 +34,7 @@ func (m *repositoryMock) DailyServiceCostGCPMapByService(servicesOrderBySUMServi
 	return m.DailyServiceCostGCPMapByService_map_string_GCPServiceCost
 }
 
-var _ DomainIF = (*domainMock)(nil)
+var _ IDomain = (*domainMock)(nil)
 
 // nolint: revive,stylecheck
 type domainMock struct {
@@ -45,7 +45,7 @@ func (m *domainMock) PlotGraph(target io.Writer, ps *domain.PlotGraphParameters)
 	return m.PlotGraph_error
 }
 
-var _ InfraIF = (*infraMock)(nil)
+var _ IInfra = (*infraMock)(nil)
 
 // nolint: revive,stylecheck
 type infraMock struct {

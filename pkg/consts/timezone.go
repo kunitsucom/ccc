@@ -1,4 +1,4 @@
-package constz
+package consts
 
 import "time"
 

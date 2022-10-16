@@ -14,9 +14,9 @@ import (
 var ErrMixedCurrenciesDataSourceIsNotSupported = errors.New("usecase: mixed currencies data source is not supported")
 
 type UseCase struct {
-	repository RepositoryIF
-	domain     DomainIF
-	infra      InfraIF
+	repository IRepository
+	domain     IDomain
+	infra      IInfra
 }
 
 type Option func(r *UseCase) *UseCase
@@ -31,9 +31,9 @@ func New(opts ...Option) *UseCase {
 	return u
 }
 
-var _ RepositoryIF = (*repository.Repository)(nil)
+var _ IRepository = (*repository.Repository)(nil)
 
-type RepositoryIF interface {
+type IRepository interface {
 	SUMServiceCostGCPAsc(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 	DailyServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 	DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost
@@ -46,9 +46,9 @@ func WithRepository(r *repository.Repository) Option {
 	}
 }
 
-var _ DomainIF = (*domain.Domain)(nil)
+var _ IDomain = (*domain.Domain)(nil)
 
-type DomainIF interface {
+type IDomain interface {
 	PlotGraph(target io.Writer, ps *domain.PlotGraphParameters) error
 }
 
@@ -59,7 +59,7 @@ func WithDomain(d *domain.Domain) Option {
 	}
 }
 
-type InfraIF interface {
+type IInfra interface {
 	SaveImage(ctx context.Context, image io.ReadSeeker, imageName string, message string) error
 }
 
