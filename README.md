@@ -51,6 +51,10 @@ unzip -j ccc_v0.0.5_darwin_arm64.zip '*/ccc'
 
 #### 1-3. Run ccc
 
+<!--
+// secretlint-disable @secretlint/secretlint-rule-slack
+-->
+
 ```bash
 # Authenticate with Google User or Service Account that has permissions
 # equivalent to `roles/bigquery.dataViewer` and `roles/bigquery.user` in some way.
@@ -68,6 +72,10 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
   -days 30 \
   -debug
 ```
+
+<!--
+// secretlint-enable
+-->
 
 It will be posted as follows:  
 

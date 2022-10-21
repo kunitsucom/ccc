@@ -63,6 +63,7 @@ func Load() {
 	flag.StringVar(&cfg.GCPBillingTable, "billing-table", "", "GCP Billing export BigQuery Table name like: project-id.dataset_id.gcp_billing_export_v1_FFFFFF_FFFFFF_FFFFFF")
 	flag.StringVar(&cfg.GCPBillingProject, "billing-project", "", "Project ID in GCP Billing export BigQuery Table")
 	flag.StringVar(&cfg.Message, "message", env.StringOrDefault(MESSAGE, ""), "Slack Message or Log Message")
+	// secretlint-disable-next-line @secretlint/secretlint-rule-slack
 	flag.StringVar(&cfg.SlackToken, "slack-token", env.StringOrDefault(SLACK_TOKEN, ""), "Slack OAuth Token like: xoxb-999999999999-9999999999999-ZZZZZZZZZZZZZZZZZZZZZZZZ")
 	flag.StringVar(&cfg.SlackChannel, "slack-channel", env.StringOrDefault(SLACK_CHANNEL, ""), "Slack Channel name")
 	flag.StringVar(&cfg.ImageDir, "image-dir", env.StringOrDefault(IMAGE_DIR, ""), "Directory to save image file")
