@@ -3,7 +3,7 @@ module github.com/kunitsuinc/ccc
 go 1.19
 
 require (
-	cloud.google.com/go/bigquery v1.42.0
+	cloud.google.com/go/bigquery v1.43.0
 	github.com/google/go-cmp v0.5.9
 	github.com/kunitsuinc/util.go v0.0.9-0.20221006124738-274abf05b22a
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
