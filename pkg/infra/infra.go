@@ -2,10 +2,9 @@ package infra
 
 import (
 	"context"
-	"io"
 
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/log"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/log"
 )
 
 var (
@@ -19,7 +18,7 @@ type Infra struct {
 
 type ImageSaver interface {
 	String() string
-	SaveImage(ctx context.Context, image io.Reader, imageName, message string) error
+	SaveImage(ctx context.Context, image []byte, imageName, message string) error
 }
 
 type Option func(i *Infra) *Infra
@@ -36,7 +35,7 @@ func New(imageSavers []ImageSaver, opts ...Option) *Infra {
 	return i
 }
 
-func (i *Infra) SaveImage(ctx context.Context, image io.ReadSeeker, imageName, message string) error {
+func (i *Infra) SaveImage(ctx context.Context, image []byte, imageName, message string) error {
 	if len(i.imageSavers) == 0 {
 		// nolint: wrapcheck
 		return ErrNoImageSavers
@@ -46,11 +45,6 @@ func (i *Infra) SaveImage(ctx context.Context, image io.ReadSeeker, imageName, m
 	for _, saver := range i.imageSavers {
 		if err := saver.SaveImage(ctx, image, imageName, message); err != nil {
 			log.Errorf("(ImageSaver).SaveImage: %s: %v", saver, err)
-			errs = append(errs, err)
-			continue
-		}
-		if _, err := image.Seek(0, io.SeekStart); err != nil {
-			log.Errorf("(io.Seeker).Seek: %v", err)
 			errs = append(errs, err)
 			continue
 		}

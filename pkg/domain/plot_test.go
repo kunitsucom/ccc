@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kunitsuinc/ccc/pkg/consts"
-	"github.com/kunitsuinc/util.go/testz"
+	"github.com/kunitsucom/ccc/pkg/consts"
+	testz "github.com/kunitsucom/util.go/test"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 )
@@ -148,7 +148,11 @@ func TestPlotGraph(t *testing.T) {
 	})
 
 	t.Run("failure(InvalidImageFormat)", func(t *testing.T) {
-		rw := testz.NewReadWriter(0, testz.ErrTestError)
+		rw := &testz.Writer{
+			WriteFunc: func(p []byte) (n int, err error) {
+				return 0, testz.ErrTestError
+			},
+		}
 		from := time.Date(2022, 2, 2, 2, 22, 22, 0, consts.TimeZone("Asia/Tokyo"))
 		d := New()
 		err := d.PlotGraph(rw, &PlotGraphParameters{

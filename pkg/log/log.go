@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/kunitsuinc/ccc/pkg/config"
+	"github.com/kunitsucom/ccc/pkg/config"
 )
 
 type Logger interface {

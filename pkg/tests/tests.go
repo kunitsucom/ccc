@@ -3,8 +3,8 @@ package tests
 import (
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/consts"
-	"github.com/kunitsuinc/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/consts"
+	"github.com/kunitsucom/ccc/pkg/domain"
 )
 
 // TestDate is

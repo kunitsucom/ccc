@@ -1,15 +1,15 @@
 package local
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/log"
-	"github.com/kunitsuinc/util.go/osz"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/log"
+	osz "github.com/kunitsucom/util.go/os"
 )
 
 type Local struct {
@@ -34,7 +34,7 @@ func (s *Local) String() string {
 	return "Local"
 }
 
-func (s *Local) SaveImage(ctx context.Context, image io.Reader, imageName, message string) error {
+func (s *Local) SaveImage(ctx context.Context, image []byte, imageName, message string) error {
 	s.imageDir = strings.TrimSuffix(s.imageDir, string(os.PathSeparator))
 
 	if err := osz.CheckDir(s.imageDir); err != nil {
@@ -49,7 +49,7 @@ func (s *Local) SaveImage(ctx context.Context, image io.Reader, imageName, messa
 		return errors.Errorf("os.Create: %w", err)
 	}
 
-	if _, err := f.ReadFrom(image); err != nil {
+	if _, err := f.ReadFrom(bytes.NewReader(image)); err != nil {
 		return errors.Errorf("(*os.File).ReadFrom: %w", err)
 	}
 

@@ -6,10 +6,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/consts"
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/log"
+	"github.com/kunitsucom/ccc/pkg/consts"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/log"
 )
 
 type sumServiceCostGCPParameter struct {
