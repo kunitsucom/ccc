@@ -3,6 +3,8 @@ REPO_ROOT       := $(shell git rev-parse --show-toplevel || pwd || echo '.')
 REPO_LOCAL_DIR  := ${REPO_ROOT}/.local
 REPO_TMP_DIR    := ${REPO_ROOT}/.tmp
 PRE_PUSH        := ${REPO_ROOT}/.git/hooks/pre-push
+GIT_TAG_LATEST      := $(shell git describe --tags --abbrev=0)
+GIT_BRANCH_CURRENT  := $(shell git rev-parse --abbrev-ref HEAD)
 GO_MODULE_NAME  := github.com/kunitsucom/ccc
 BUILD_VERSION   := $(shell git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
 BUILD_REVISION  := $(shell git rev-parse HEAD)
@@ -82,6 +84,9 @@ act-go-test: act-check
 
 .PHONY: release
 release: ci ## Run goxz and gh release upload
-	command -v goxz || go install github.com/Songmu/goxz/cmd/goxz@latest
-	goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "${BUILD_VERSION}" -build-ldflags "-X ${GO_MODULE_NAME}/pkg/config.version=${BUILD_VERSION} -X ${GO_MODULE_NAME}/pkg/config.revision=${BUILD_REVISION} -X ${GO_MODULE_NAME}/pkg/config.branch=${BUILD_BRANCH} -X ${GO_MODULE_NAME}/pkg/config.timestamp=${BUILD_TIMESTAMP}" ./cmd/ccc
-	gh release upload "${BUILD_VERSION}" "${REPO_TMP_DIR}"/*"${BUILD_VERSION}"*
+	@command -v goxz >/dev/null || go install github.com/Songmu/goxz/cmd/goxz@latest
+	git checkout main
+	git checkout "${GIT_TAG_LATEST}"
+	goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "`git describe --tags --abbrev=0`" -trimpath -build-ldflags "-s -w -X ${GO_MODULE_NAME}/pkg/config.version=`git describe --tags --abbrev=0` -X ${GO_MODULE_NAME}/pkg/config.revision=`git rev-parse HEAD` -X ${GO_MODULE_NAME}/pkg/config.branch=`git rev-parse --abbrev-ref HEAD` -X ${GO_MODULE_NAME}/pkg/config.timestamp=`git log -n 1 --format='%cI'`" ./cmd/ccc
+	gh release upload "`git describe --tags --abbrev=0`" "${REPO_TMP_DIR}"/*"`git describe --tags --abbrev=0`"*
+	git checkout "${GIT_BRANCH_CURRENT}"
