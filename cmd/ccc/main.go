@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kunitsuinc/ccc/pkg/config"
-	"github.com/kunitsuinc/ccc/pkg/entrypoint"
-	"github.com/kunitsuinc/ccc/pkg/log"
-	"github.com/kunitsuinc/util.go/must"
+	"github.com/kunitsucom/ccc/pkg/config"
+	"github.com/kunitsucom/ccc/pkg/entrypoint"
+	"github.com/kunitsucom/ccc/pkg/log"
+	"github.com/kunitsucom/util.go/must"
 )
 
 func main() {

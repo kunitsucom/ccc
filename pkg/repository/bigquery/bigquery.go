@@ -7,7 +7,7 @@ import (
 	"text/template"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/kunitsuinc/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/errors"
 	"google.golang.org/api/iterator"
 )
 

@@ -1,7 +1,7 @@
 SHELL     := /usr/bin/env bash -Eeu -o pipefail
 GITROOT   := $(shell git rev-parse --show-toplevel || pwd || echo '.')
 PRE_PUSH  := ${GITROOT}/.git/hooks/pre-push
-GOMODULE  := github.com/kunitsuinc/ccc
+GOMODULE  := github.com/kunitsucom/ccc
 VERSION   := $(shell git describe --tags --abbrev=0 --always)
 REVISION  := $(shell git log -1 --format='%H')
 BRANCH    := $(shell git rev-parse --abbrev-ref HEAD)

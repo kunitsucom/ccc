@@ -6,9 +6,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/infra"
-	"github.com/kunitsuinc/ccc/pkg/repository"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/infra"
+	"github.com/kunitsucom/ccc/pkg/repository"
 )
 
 var ErrMixedCurrenciesDataSourceIsNotSupported = errors.New("usecase: mixed currencies data source is not supported")
@@ -60,7 +60,7 @@ func WithDomain(d *domain.Domain) Option {
 }
 
 type IInfra interface {
-	SaveImage(ctx context.Context, image io.ReadSeeker, imageName string, message string) error
+	SaveImage(ctx context.Context, image []byte, imageName string, message string) error
 }
 
 func WithInfra(i *infra.Infra) Option {

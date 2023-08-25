@@ -1,17 +1,16 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/consts"
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/log"
-	"github.com/kunitsuinc/util.go/bytez"
-	"github.com/kunitsuinc/util.go/slice"
+	"github.com/kunitsucom/ccc/pkg/consts"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/log"
+	slice "github.com/kunitsucom/util.go/slices"
 	"gonum.org/v1/plot/plotter"
 )
 
@@ -25,7 +24,7 @@ type PlotDailyServiceCostGCPParameters struct {
 	Message        string
 }
 
-func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWriter, ps *PlotDailyServiceCostGCPParameters) error {
+func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, buf *bytes.Buffer, ps *PlotDailyServiceCostGCPParameters) error {
 	sumServiceCostGCPAsc, err := u.repository.SUMServiceCostGCPAsc(ctx, ps.BillingTable, ps.BillingProject, ps.From, ps.To, ps.TimeZone, 0.01)
 	if err != nil {
 		return errors.Errorf("(IRepository).SUMServiceCostGCP: %w", err)
@@ -56,7 +55,7 @@ func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWri
 	}
 
 	if err := u.domain.PlotGraph(
-		target,
+		buf,
 		&domain.PlotGraphParameters{
 			GraphTitle:        "\n" + fmt.Sprintf("Google Cloud Platform `%s` Cost (from %s to %s)", ps.BillingProject, ps.From.Format(consts.DateOnly), ps.To.Format(consts.DateOnly)),
 			XLabelText:        "\n" + fmt.Sprintf("Date (%s)", ps.TimeZone.String()),
@@ -75,7 +74,7 @@ func (u *UseCase) PlotDailyServiceCostGCP(ctx context.Context, target io.ReadWri
 		return errors.Errorf("(IDomain).PlotGraph: %w", err)
 	}
 
-	if err := u.infra.SaveImage(ctx, bytez.NewReadSeekBuffer(target), fmt.Sprintf("%s.%s.%s.%s", ps.BillingTable, ps.BillingProject, ps.To.Format(consts.DateOnly), ps.ImageFormat), ps.Message); err != nil {
+	if err := u.infra.SaveImage(ctx, buf.Bytes(), fmt.Sprintf("%s.%s.%s.%s", ps.BillingTable, ps.BillingProject, ps.To.Format(consts.DateOnly), ps.ImageFormat), ps.Message); err != nil {
 		return errors.Errorf("(IInfra).SaveImage: %w", err)
 	}
 

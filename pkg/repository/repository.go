@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/repository/bigquery"
-	"github.com/kunitsuinc/util.go/slice"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/repository/bigquery"
+	slicez "github.com/kunitsucom/util.go/slices"
 )
 
 type Repository struct {
@@ -54,7 +54,7 @@ func (r *Repository) DailyServiceCostGCP(ctx context.Context, billingTable, bill
 func (r *Repository) DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
 	serviceCost := make(map[string][]domain.GCPServiceCost)
 	for _, service := range servicesOrderBySUMServiceCostGCP {
-		serviceCost[service] = slice.Filter(dailyServiceCostGCP, func(index int, source domain.GCPServiceCost) bool {
+		serviceCost[service] = slicez.Filter(dailyServiceCostGCP, func(index int, source domain.GCPServiceCost) bool {
 			// nolint: scopelint
 			return service == source.Service
 		})

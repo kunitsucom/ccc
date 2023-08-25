@@ -5,15 +5,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/config"
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/infra"
-	"github.com/kunitsuinc/ccc/pkg/infra/local"
-	"github.com/kunitsuinc/ccc/pkg/infra/slack"
-	"github.com/kunitsuinc/ccc/pkg/repository"
-	"github.com/kunitsuinc/ccc/pkg/repository/bigquery"
-	"github.com/kunitsuinc/ccc/pkg/usecase"
+	"github.com/kunitsucom/ccc/pkg/config"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/infra"
+	"github.com/kunitsucom/ccc/pkg/infra/local"
+	"github.com/kunitsucom/ccc/pkg/infra/slack"
+	"github.com/kunitsucom/ccc/pkg/repository"
+	"github.com/kunitsucom/ccc/pkg/repository/bigquery"
+	"github.com/kunitsucom/ccc/pkg/usecase"
 )
 
 func CCC(ctx context.Context) error {

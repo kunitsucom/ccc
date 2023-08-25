@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/log"
-	"github.com/kunitsuinc/util.go/net/http/httputilz"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/log"
+	httputilz "github.com/kunitsucom/util.go/net/http/httputil"
 )
 
 var (
@@ -47,7 +47,7 @@ func (s *Slack) String() string {
 }
 
 // nolint: cyclop
-func (s *Slack) SaveImage(ctx context.Context, image io.Reader, imageName, message string) error {
+func (s *Slack) SaveImage(ctx context.Context, image []byte, imageName, message string) error {
 	requestBody := &bytes.Buffer{}
 
 	mpw := multipart.NewWriter(requestBody)
@@ -56,7 +56,7 @@ func (s *Slack) SaveImage(ctx context.Context, image io.Reader, imageName, messa
 		return errors.Errorf("(*multipart.Writer).CreateFormFile: %w", err)
 	}
 
-	if _, err := io.Copy(part, image); err != nil {
+	if _, err := io.Copy(part, bytes.NewReader(image)); err != nil {
 		return errors.Errorf("(io.Writer).Write: %w", err)
 	}
 	if err := mpw.WriteField("token", s.token); err != nil {

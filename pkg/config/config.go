@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/consts"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/util.go/env"
+	"github.com/kunitsucom/ccc/pkg/consts"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/util.go/env"
 )
 
 var ErrFlagOrEnvIsNotEnough = errors.New("config: flag or environment variable is not enough")

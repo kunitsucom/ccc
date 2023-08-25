@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/kunitsuinc/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/domain"
 )
 
 var _ IRepository = (*repositoryMock)(nil)
@@ -52,6 +52,6 @@ type infraMock struct {
 	SaveImage_error error
 }
 
-func (m *infraMock) SaveImage(ctx context.Context, image io.ReadSeeker, imageName string, message string) error {
+func (m *infraMock) SaveImage(ctx context.Context, image []byte, imageName string, message string) error {
 	return m.SaveImage_error
 }

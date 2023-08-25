@@ -6,11 +6,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kunitsuinc/ccc/pkg/domain"
-	"github.com/kunitsuinc/ccc/pkg/errors"
-	"github.com/kunitsuinc/ccc/pkg/tests"
-	"github.com/kunitsuinc/util.go/errorz"
-	"github.com/kunitsuinc/util.go/testz"
+	"github.com/kunitsucom/ccc/pkg/domain"
+	"github.com/kunitsucom/ccc/pkg/errors"
+	"github.com/kunitsucom/ccc/pkg/tests"
+errorz	"github.com/kunitsucom/util.go/errors"
+testz	"github.com/kunitsucom/util.go/test"
 )
 
 func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {

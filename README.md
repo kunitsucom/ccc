@@ -1,13 +1,13 @@
 # ccc - Cloud Cost Checker
 
-[![license](https://img.shields.io/github/license/kunitsuinc/ccc)](LICENSE)
-[![pkg](https://pkg.go.dev/badge/github.com/kunitsuinc/ccc)](https://pkg.go.dev/github.com/kunitsuinc/ccc)
-[![goreportcard](https://goreportcard.com/badge/github.com/kunitsuinc/ccc)](https://goreportcard.com/report/github.com/kunitsuinc/ccc)
-[![workflow](https://github.com/kunitsuinc/ccc/workflows/CI/badge.svg)](https://github.com/kunitsuinc/ccc/tree/main)
-[![codecov](https://codecov.io/gh/kunitsuinc/ccc/branch/main/graph/badge.svg?token=4UML9FB7BX)](https://codecov.io/gh/kunitsuinc/ccc)
-[![sourcegraph](https://sourcegraph.com/github.com/kunitsuinc/ccc/-/badge.svg)](https://sourcegraph.com/github.com/kunitsuinc/ccc)
+[![license](https://img.shields.io/github/license/kunitsucom/ccc)](LICENSE)
+[![pkg](https://pkg.go.dev/badge/github.com/kunitsucom/ccc)](https://pkg.go.dev/github.com/kunitsucom/ccc)
+[![goreportcard](https://goreportcard.com/badge/github.com/kunitsucom/ccc)](https://goreportcard.com/report/github.com/kunitsucom/ccc)
+[![workflow](https://github.com/kunitsucom/ccc/workflows/CI/badge.svg)](https://github.com/kunitsucom/ccc/tree/main)
+[![codecov](https://codecov.io/gh/kunitsucom/ccc/branch/main/graph/badge.svg?token=4UML9FB7BX)](https://codecov.io/gh/kunitsucom/ccc)
+[![sourcegraph](https://sourcegraph.com/github.com/kunitsucom/ccc/-/badge.svg)](https://sourcegraph.com/github.com/kunitsucom/ccc)
 
-[ccc - Cloud Cost Checker](https://github.com/kunitsuinc/ccc) collects, calculates, graphs and notifies IaaS costs.  
+[ccc - Cloud Cost Checker](https://github.com/kunitsucom/ccc) collects, calculates, graphs and notifies IaaS costs.  
 
 ## Project Goal
 
@@ -37,16 +37,18 @@
 
 #### 1-2. Download ccc for your execution environment
 
-- [Releases · kunitsuinc/ccc](https://github.com/kunitsuinc/ccc/releases)
+- [Releases · kunitsucom/ccc](https://github.com/kunitsucom/ccc/releases)
 
 Download ccc for your execution environment as follows:
 
 ```bash
+VERSION=v0.0.6
+
 # download
-curl -fLROSs https://github.com/kunitsuinc/ccc/releases/download/v0.0.5/ccc_v0.0.5_darwin_arm64.zip
+curl -fLROSs https://github.com/kunitsucom/ccc/releases/download/${VERSION}/ccc_${VERSION}_darwin_arm64.zip
 
 # unzip
-unzip -j ccc_v0.0.5_darwin_arm64.zip '*/ccc'
+unzip -j ccc_${VERSION}_darwin_arm64.zip '*/ccc'
 ```
 
 #### 1-3. Run ccc
@@ -84,7 +86,7 @@ It will be posted as follows:
 ## If you want to post cost graphs to Slack on a regular basis
 
 I highly recommend this GitHub Actions: [ccc-actions - GitHub Actions for Cloud Cost Checker
-](https://github.com/kunitsuinc/ccc-actions)  
+](https://github.com/kunitsucom/ccc-actions)  
 
 ## TODO
 
