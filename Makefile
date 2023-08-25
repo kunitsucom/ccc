@@ -1,6 +1,7 @@
 SHELL           := /usr/bin/env bash -Eeu -o pipefail
 REPO_ROOT       := $(shell git rev-parse --show-toplevel || pwd || echo '.')
 REPO_LOCAL_DIR  := ${REPO_ROOT}/.local
+REPO_TMP_DIR    := ${REPO_ROOT}/.tmp
 PRE_PUSH        := ${REPO_ROOT}/.git/hooks/pre-push
 GO_MODULE_NAME  := github.com/kunitsucom/ccc
 BUILD_VERSION   := $(shell git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
@@ -79,7 +80,8 @@ act-go-lint: act-check
 act-go-test: act-check
 	act pull_request --container-architecture linux/amd64 -P ubuntu-latest=catthehacker/ubuntu:act-latest -W .github/workflows/go-test.yml
 
-.PHONY: goxz
-goxz: ci ## Run goxz for release
+.PHONY: release
+release: ci ## Run goxz and gh release upload
 	command -v goxz || go install github.com/Songmu/goxz/cmd/goxz@latest
-	goxz -d ./.tmp -os=linux,darwin,windows -arch=amd64,arm64 -pv ${BUILD_VERSION} -build-ldflags "-X ${GO_MODULE_NAME}/pkg/config.version=${BUILD_VERSION} -X ${GO_MODULE_NAME}/pkg/config.revision=${BUILD_REVISION} -X ${GO_MODULE_NAME}/pkg/config.branch=${BUILD_BRANCH} -X ${GO_MODULE_NAME}/pkg/config.timestamp=${BUILD_TIMESTAMP}" ./cmd/ccc
+	goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "${BUILD_VERSION}" -build-ldflags "-X ${GO_MODULE_NAME}/pkg/config.version=${BUILD_VERSION} -X ${GO_MODULE_NAME}/pkg/config.revision=${BUILD_REVISION} -X ${GO_MODULE_NAME}/pkg/config.branch=${BUILD_BRANCH} -X ${GO_MODULE_NAME}/pkg/config.timestamp=${BUILD_TIMESTAMP}" ./cmd/ccc
+	gh release upload "${BUILD_VERSION}" "${REPO_TMP_DIR}"/*"${BUILD_VERSION}"*
