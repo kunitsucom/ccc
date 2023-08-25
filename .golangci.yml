@@ -2,6 +2,7 @@
 linters:
   enable-all: true
   disable:
+    - depguard # unnecessary
     - exhaustruct # https://github.com/GaijinEntertainment/go-exhaustruct
     - exhaustivestruct # https://github.com/mbilski/exhaustivestruct
     - golint # deprecated https://github.com/golang/lint
@@ -47,3 +48,4 @@ issues:
         - maintidx
         - noctx
         - varnamelen
+        - wrapcheck

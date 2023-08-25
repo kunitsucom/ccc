@@ -34,7 +34,7 @@ func (s *Local) String() string {
 	return "Local"
 }
 
-func (s *Local) SaveImage(ctx context.Context, image []byte, imageName, message string) error {
+func (s *Local) SaveImage(_ context.Context, image []byte, imageName, message string) error {
 	s.imageDir = strings.TrimSuffix(s.imageDir, string(os.PathSeparator))
 
 	if err := osz.CheckDir(s.imageDir); err != nil {
