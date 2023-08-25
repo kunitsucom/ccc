@@ -1,11 +1,11 @@
-SHELL     := /usr/bin/env bash -Eeu -o pipefail
-GITROOT   := $(shell git rev-parse --show-toplevel || pwd || echo '.')
-PRE_PUSH  := ${GITROOT}/.git/hooks/pre-push
-GOMODULE  := github.com/kunitsucom/ccc
-VERSION   := $(shell git describe --tags --abbrev=0 --always)
-REVISION  := $(shell git log -1 --format='%H')
-BRANCH    := $(shell git rev-parse --abbrev-ref HEAD)
-TIMESTAMP := $(shell git log -1 --format='%cI')
+SHELL           := /usr/bin/env bash -Eeu -o pipefail
+REPO_ROOT       := $(shell git rev-parse --show-toplevel || pwd || echo '.')
+PRE_PUSH        := ${REPO_ROOT}/.git/hooks/pre-push
+GO_MODULE_NAME  := github.com/kunitsucom/ccc
+BUILD_VERSION   := $(shell git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
+BUILD_REVISION  := $(shell git rev-parse HEAD)
+BUILD_BRANCH    := $(shell git rev-parse --abbrev-ref HEAD | tr / -)
+BUILD_TIMESTAMP := $(shell git log -n 1 --format='%cI')
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -21,7 +21,7 @@ setup: githooks ## Setup tools for development
 
 .PHONY: githooks
 githooks:
-	@[[ -f "${PRE_PUSH}" ]] || cp -ai "${GITROOT}/.githooks/pre-push" "${PRE_PUSH}"
+	@[[ -f "${PRE_PUSH}" ]] || cp -ai "${REPO_ROOT}/.githooks/pre-push" "${PRE_PUSH}"
 
 clean:  ## Clean up chace, etc
 	go clean -x -cache -testcache -modcache -fuzzcache
@@ -57,4 +57,4 @@ ci: lint credits test ## CI command set
 .PHONY: goxz
 goxz: ci ## Run goxz for release
 	command -v goxz || go install github.com/Songmu/goxz/cmd/goxz@latest
-	goxz -d ./.tmp -os=linux,darwin,windows -arch=amd64,arm64 -pv ${VERSION} -build-ldflags "-X ${GOMODULE}/pkg/config.version=${VERSION} -X ${GOMODULE}/pkg/config.revision=${REVISION} -X ${GOMODULE}/pkg/config.branch=${BRANCH} -X ${GOMODULE}/pkg/config.timestamp=${TIMESTAMP}" ./cmd/ccc
+	goxz -d ./.tmp -os=linux,darwin,windows -arch=amd64,arm64 -pv ${BUILD_VERSION} -build-ldflags "-X ${GO_MODULE_NAME}/pkg/config.version=${BUILD_VERSION} -X ${GO_MODULE_NAME}/pkg/config.revision=${BUILD_REVISION} -X ${GO_MODULE_NAME}/pkg/config.branch=${BUILD_BRANCH} -X ${GO_MODULE_NAME}/pkg/config.timestamp=${BUILD_TIMESTAMP}" ./cmd/ccc
