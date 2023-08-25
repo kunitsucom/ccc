@@ -87,6 +87,6 @@ release: ci ## Run goxz and gh release upload
 	@command -v goxz >/dev/null || go install github.com/Songmu/goxz/cmd/goxz@latest
 	git checkout main
 	git checkout "${GIT_TAG_LATEST}"
-	goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "`git describe --tags --abbrev=0`" -trimpath -build-ldflags "-s -w -X ${GO_MODULE_NAME}/pkg/config.version=`git describe --tags --abbrev=0` -X ${GO_MODULE_NAME}/pkg/config.revision=`git rev-parse HEAD` -X ${GO_MODULE_NAME}/pkg/config.branch=`git rev-parse --abbrev-ref HEAD` -X ${GO_MODULE_NAME}/pkg/config.timestamp=`git log -n 1 --format='%cI'`" ./cmd/ccc
-	gh release upload "`git describe --tags --abbrev=0`" "${REPO_TMP_DIR}"/*"`git describe --tags --abbrev=0`"*
+	-goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "`git describe --tags --abbrev=0`" -trimpath -build-ldflags "-s -w -X ${GO_MODULE_NAME}/pkg/config.version=`git describe --tags --abbrev=0` -X ${GO_MODULE_NAME}/pkg/config.revision=`git rev-parse HEAD` -X ${GO_MODULE_NAME}/pkg/config.branch=`git rev-parse --abbrev-ref HEAD` -X ${GO_MODULE_NAME}/pkg/config.timestamp=`git log -n 1 --format='%cI'`" ./cmd/ccc
+	-gh release upload "`git describe --tags --abbrev=0`" "${REPO_TMP_DIR}"/*"`git describe --tags --abbrev=0`"*
 	git checkout "${GIT_BRANCH_CURRENT}"
