@@ -42,7 +42,7 @@ lint:  ## Run secretlint, go mod tidy, golangci-lint
 .PHONY: credits
 credits:  ## Generate CREDITS file
 	command -v gocredits || go install github.com/Songmu/gocredits/cmd/gocredits@latest
-	gocredits . > CREDITS
+	gocredits -skip-missing . > CREDITS
 	git diff --exit-code
 
 .PHONY: test

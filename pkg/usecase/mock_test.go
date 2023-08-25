@@ -13,45 +13,43 @@ var _ IRepository = (*repositoryMock)(nil)
 
 // nolint: revive,stylecheck
 type repositoryMock struct {
-	SUMServiceCostGCP_GCPServiceCost []domain.GCPServiceCost
-	SUMServiceCostGCP_error          error
+	SUMServiceCostGCPFunc func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 
-	DailyServiceCostGCP_GCPServiceCost []domain.GCPServiceCost
-	DailyServiceCostGCP_error          error
+	DailyServiceCostGCPFunc func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error)
 
-	DailyServiceCostGCPMapByService_map_string_GCPServiceCost map[string][]domain.GCPServiceCost
+	DailyServiceCostGCPMapByServiceFunc func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost
 }
 
 func (m *repositoryMock) SUMServiceCostGCPAsc(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
-	return m.SUMServiceCostGCP_GCPServiceCost, m.SUMServiceCostGCP_error
+	return m.SUMServiceCostGCPFunc(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 }
 
 func (m *repositoryMock) DailyServiceCostGCP(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
-	return m.DailyServiceCostGCP_GCPServiceCost, m.DailyServiceCostGCP_error
+	return m.DailyServiceCostGCPFunc(ctx, billingTable, billingProject, from, to, tz, costThreshold)
 }
 
 func (m *repositoryMock) DailyServiceCostGCPMapByService(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
-	return m.DailyServiceCostGCPMapByService_map_string_GCPServiceCost
+	return m.DailyServiceCostGCPMapByServiceFunc(servicesOrderBySUMServiceCostGCP, dailyServiceCostGCP)
 }
 
 var _ IDomain = (*domainMock)(nil)
 
 // nolint: revive,stylecheck
 type domainMock struct {
-	PlotGraph_error error
+	PlotGraphFunc func(target io.Writer, ps *domain.PlotGraphParameters) error
 }
 
 func (m *domainMock) PlotGraph(target io.Writer, ps *domain.PlotGraphParameters) error {
-	return m.PlotGraph_error
+	return m.PlotGraphFunc(target, ps)
 }
 
 var _ IInfra = (*infraMock)(nil)
 
 // nolint: revive,stylecheck
 type infraMock struct {
-	SaveImage_error error
+	SaveImageFunc func(ctx context.Context, image []byte, imageName string, message string) error
 }
 
 func (m *infraMock) SaveImage(ctx context.Context, image []byte, imageName string, message string) error {
-	return m.SaveImage_error
+	return m.SaveImageFunc(ctx, image, imageName, message)
 }

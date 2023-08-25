@@ -4,13 +4,15 @@ package usecase
 import (
 	"bytes"
 	"context"
+	"io"
 	"testing"
+	"time"
 
 	"github.com/kunitsucom/ccc/pkg/domain"
 	"github.com/kunitsucom/ccc/pkg/errors"
 	"github.com/kunitsucom/ccc/pkg/tests"
-errorz	"github.com/kunitsucom/util.go/errors"
-testz	"github.com/kunitsucom/util.go/test"
+	errorz "github.com/kunitsucom/util.go/errors"
+	testz "github.com/kunitsucom/util.go/test"
 )
 
 func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
@@ -20,17 +22,21 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				SUMServiceCostGCP_error:                                   nil,
-				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				DailyServiceCostGCP_error:                                 nil,
-				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPMapByServiceFunc: func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
+					return map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)}
+				},
 			},
 			domain: &domainMock{
-				PlotGraph_error: nil,
+				PlotGraphFunc: func(target io.Writer, ps *domain.PlotGraphParameters) error { return nil },
 			},
 			infra: &infraMock{
-				SaveImage_error: nil,
+				SaveImageFunc: func(ctx context.Context, image []byte, imageName string, message string) error { return nil },
 			},
 		}
 		ctx := context.Background()
@@ -45,8 +51,15 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost: []domain.GCPServiceCost{},
-				SUMServiceCostGCP_error:          testz.ErrTestError,
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return nil, testz.ErrTestError
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPMapByServiceFunc: func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
+					return map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)}
+				},
 			},
 		}
 		ctx := context.Background()
@@ -61,9 +74,12 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost: tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				SUMServiceCostGCP_error:          nil,
-				DailyServiceCostGCP_error:        testz.ErrTestError,
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return nil, testz.ErrTestError
+				},
 			},
 		}
 		ctx := context.Background()
@@ -78,11 +94,15 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost:                          append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...),
-				SUMServiceCostGCP_error:                                   nil,
-				DailyServiceCostGCP_GCPServiceCost:                        append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...),
-				DailyServiceCostGCP_error:                                 nil,
-				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...), nil
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return append(tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "JPY", 5)...), nil
+				},
+				DailyServiceCostGCPMapByServiceFunc: func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
+					return map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)}
+				},
 			},
 		}
 		ctx := context.Background()
@@ -97,14 +117,18 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				SUMServiceCostGCP_error:                                   nil,
-				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				DailyServiceCostGCP_error:                                 nil,
-				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPMapByServiceFunc: func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
+					return map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)}
+				},
 			},
 			domain: &domainMock{
-				PlotGraph_error: testz.ErrTestError,
+				PlotGraphFunc: func(target io.Writer, ps *domain.PlotGraphParameters) error { return testz.ErrTestError },
 			},
 		}
 		ctx := context.Background()
@@ -119,17 +143,23 @@ func TestUsecase_PlotDailyServiceCostGCP(t *testing.T) {
 		t.Parallel()
 		u := &UseCase{
 			repository: &repositoryMock{
-				SUMServiceCostGCP_GCPServiceCost:                          tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				SUMServiceCostGCP_error:                                   nil,
-				DailyServiceCostGCP_GCPServiceCost:                        tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5),
-				DailyServiceCostGCP_error:                                 nil,
-				DailyServiceCostGCPMapByService_map_string_GCPServiceCost: map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)},
+				SUMServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPFunc: func(ctx context.Context, billingTable string, billingProject string, from time.Time, to time.Time, tz *time.Location, costThreshold float64) ([]domain.GCPServiceCost, error) {
+					return tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5), nil
+				},
+				DailyServiceCostGCPMapByServiceFunc: func(servicesOrderBySUMServiceCostGCP []string, dailyServiceCostGCP []domain.GCPServiceCost) map[string][]domain.GCPServiceCost {
+					return map[string][]domain.GCPServiceCost{"TestService": tests.NewGCPServiceCosts(tests.TestDate, "test-project", "TestService", 123.45, 1, "USD", 5)}
+				},
 			},
 			domain: &domainMock{
-				PlotGraph_error: nil,
+				PlotGraphFunc: func(target io.Writer, ps *domain.PlotGraphParameters) error { return nil },
 			},
 			infra: &infraMock{
-				SaveImage_error: testz.ErrTestError,
+				SaveImageFunc: func(ctx context.Context, image []byte, imageName string, message string) error {
+					return testz.ErrTestError
+				},
 			},
 		}
 		ctx := context.Background()
