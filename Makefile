@@ -1,15 +1,15 @@
-SHELL           := /usr/bin/env bash -Eeu -o pipefail
-REPO_ROOT       := $(shell git rev-parse --show-toplevel || pwd || echo '.')
-REPO_LOCAL_DIR  := ${REPO_ROOT}/.local
-REPO_TMP_DIR    := ${REPO_ROOT}/.tmp
-PRE_PUSH        := ${REPO_ROOT}/.git/hooks/pre-push
-GIT_TAG_LATEST      := $(shell git describe --tags --abbrev=0)
-GIT_BRANCH_CURRENT  := $(shell git rev-parse --abbrev-ref HEAD)
-GO_MODULE_NAME  := github.com/kunitsucom/ccc
-BUILD_VERSION   := $(shell git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
-BUILD_REVISION  := $(shell git rev-parse HEAD)
-BUILD_BRANCH    := $(shell git rev-parse --abbrev-ref HEAD | tr / -)
-BUILD_TIMESTAMP := $(shell git log -n 1 --format='%cI')
+SHELL              := /usr/bin/env bash -Eeu -o pipefail
+REPO_ROOT          := $(shell git rev-parse --show-toplevel || pwd || echo '.')
+REPO_LOCAL_DIR     := ${REPO_ROOT}/.local
+REPO_TMP_DIR       := ${REPO_ROOT}/.tmp
+PRE_PUSH           := ${REPO_ROOT}/.git/hooks/pre-push
+GIT_TAG_LATEST     := $(shell git describe --tags --abbrev=0)
+GIT_BRANCH_CURRENT := $(shell git rev-parse --abbrev-ref HEAD)
+GO_MODULE_NAME     := github.com/kunitsucom/ccc
+BUILD_VERSION      := $(shell git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
+BUILD_REVISION     := $(shell git rev-parse HEAD)
+BUILD_BRANCH       := $(shell git rev-parse --abbrev-ref HEAD | tr / -)
+BUILD_TIMESTAMP    := $(shell git log -n 1 --format='%cI')
 
 export PATH := ${REPO_LOCAL_DIR}/bin:${REPO_ROOT}/.bin:${PATH}
 
