@@ -3,7 +3,8 @@
 [![license](https://img.shields.io/github/license/kunitsucom/ccc)](LICENSE)
 [![pkg](https://pkg.go.dev/badge/github.com/kunitsucom/ccc)](https://pkg.go.dev/github.com/kunitsucom/ccc)
 [![goreportcard](https://goreportcard.com/badge/github.com/kunitsucom/ccc)](https://goreportcard.com/report/github.com/kunitsucom/ccc)
-[![workflow](https://github.com/kunitsucom/ccc/workflows/CI/badge.svg)](https://github.com/kunitsucom/ccc/tree/main)
+[![workflow](https://github.com/kunitsucom/ccc/workflows/go-lint/badge.svg)](https://github.com/kunitsucom/ccc/tree/main)
+[![workflow](https://github.com/kunitsucom/ccc/workflows/go-test/badge.svg)](https://github.com/kunitsucom/ccc/tree/main)
 [![codecov](https://codecov.io/gh/kunitsucom/ccc/branch/main/graph/badge.svg?token=4UML9FB7BX)](https://codecov.io/gh/kunitsucom/ccc)
 [![sourcegraph](https://sourcegraph.com/github.com/kunitsucom/ccc/-/badge.svg)](https://sourcegraph.com/github.com/kunitsucom/ccc)
 
