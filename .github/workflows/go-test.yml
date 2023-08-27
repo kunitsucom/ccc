@@ -102,7 +102,7 @@ jobs:
             ${{ runner.os }}-go-
       - name: Run go test
         env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
         working-directory: ${{ env.WORKDIR }}
         run: |
           direnv exec . make test

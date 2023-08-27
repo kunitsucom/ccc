@@ -103,7 +103,7 @@ jobs:
       - name: Run go mod tidy
         if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
         working-directory: ${{ env.WORKDIR }}
         run: |
           direnv exec . go mod tidy
