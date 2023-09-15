@@ -106,7 +106,7 @@ jobs:
         working-directory: ${{ env.WORKDIR }}
         run: |
           direnv exec . make test
-      - uses: codecov/codecov-action@v3 # ref. https://github.com/codecov/codecov-action#example-workflowyml-with-codecov-action
+      - uses: codecov/codecov-action@v4 # ref. https://github.com/codecov/codecov-action#example-workflowyml-with-codecov-action
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ env.WORKDIR }}/coverage.txt
