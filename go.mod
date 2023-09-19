@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/kunitsucom/util.go v0.0.57-rc.1
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
-	gonum.org/v1/plot v0.13.0
+	gonum.org/v1/plot v0.14.0
 	google.golang.org/api v0.138.0
 )
 
