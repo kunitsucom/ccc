@@ -3,12 +3,12 @@ module github.com/kunitsucom/ccc
 go 1.21
 
 require (
-	cloud.google.com/go/bigquery v1.54.0
+	cloud.google.com/go/bigquery v1.56.0
 	github.com/google/go-cmp v0.5.9
 	github.com/kunitsucom/util.go v0.0.57-rc.1
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gonum.org/v1/plot v0.13.0
-	google.golang.org/api v0.138.0
+	google.golang.org/api v0.139.0
 )
 
 require (
@@ -31,7 +31,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v23.5.26+incompatible // indirect
-	github.com/google/s2a-go v0.1.5 // indirect
+	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
